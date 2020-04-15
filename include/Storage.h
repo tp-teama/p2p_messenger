@@ -1,3 +1,4 @@
+
 #pragma once
 #include <iostream>
 #include <string>
@@ -15,4 +16,5 @@ public:
 private:
 	std::string conn;
 };
+
 

@@ -1,3 +1,4 @@
+
 #include "Storage.h"
 User& Storage::GetUser(unsigned int id)
 {
@@ -40,3 +41,4 @@ int Storage::UpdateUser(unsigned int id_user,std::string nickname)
 	std :: cout << "New IP is installed succesfully" << endl;
 	return 1;
 }
+
