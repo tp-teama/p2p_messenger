@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string.h>
+#include <string>
 #include <iostream>
 #include "Config.h"
 using namespace std;
