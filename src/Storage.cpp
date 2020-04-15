@@ -1,37 +1,43 @@
 #include "Storage.h"
-string& Storage::GetUser(string Nick)
+User& Storage::GetUser(unsigned int id)
 {
-	string* Ip = new string;
-	cout << Nick << endl;
-	return *Ip;
+	std :: cout << Nick << endl;
+	return;
 }
-User& Storage::CreateUser(string Nick, string path_private_key)
+User& Storage::CreateUser(string Nick)
 {
 
-	cout << "I have create a new user!" << endl;
+	std :: cout << "I have create a new user!" << endl;
 	return;
 }
-Chat& Storage::CreateChat(int id_1, int id_2, string message)
+User* Storage::GetUsersByNick(std::string)
 {
-	cout << "I have create a new chat!" << endl;
+	std :: cout << "I have create a new user!" << endl;
 	return;
 }
-int Storage::GetUserId(string Nick)
+Chat& Storage::CreateChat(unsigned int id_1,unsigned int id_2,std::string message)
 {
-	return 1;
-}
-Chat& Storage::GetChat(int id_1, int id_2)
-{
-	cout << "Get chat!" << endl;
+	std :: cout << "I have create a new chat!" << endl;
 	return;
 }
-int Storage::AddMessage(string message, int id_chat)
+Chat& Storage::GetChat(unsigned int id_1)
 {
-	cout << "Add a new message" <<	message << endl;
-	return 1;
+	std :: cout << "Get chat!" << endl;
+	return;
 }
-int Storage::UpdateUser(int id_user, string path_private_key)
+Chat* Storage::GetAllMyChats (unsigned int id_chat){
+	return;
+}
+int Storage::DeleteChat(unsigned int id_chat){
+	return;
+}
+Message& Storage::SendMessage(Message message)
 {
-	cout << "New IP is installed succesfully" << endl;
+	std :: cout << "Add a new message" <<  endl;
+	return;
+}
+int Storage::UpdateUser(unsigned int id_user,std::string nickname)
+{
+	std :: cout << "New IP is installed succesfully" << endl;
 	return 1;
 }

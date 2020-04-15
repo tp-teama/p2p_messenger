@@ -5,10 +5,11 @@ class User
 {
 private:
 std::string nickname;
-std::string privateKeyPath;
-uuid userUuid;
+unsigned int uuid;
 public:
-	std::string& GetUser(std::string);
-	int UpdateUser(int, std::string);
+	User& GetUser(unsigned int);
+	int UpdateUser(unsigned int, std::string);
+	User& CreateUser(std::string);
+	User* GetUsersByNick(std::string);
 };
 

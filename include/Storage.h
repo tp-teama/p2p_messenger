@@ -1,16 +1,18 @@
 #pragma once
 #include <iostream>
 #include <string>
-using namespace std;
-class Storage
-{
+class Storage {
 public:
-	string& GetUser(string);
-	User& CreateUser(string, string);
-	Chat& CreateChat(int, int, string);
-	int GetUserId(string);
-	Chat& GetChat(int, int);
-	int AddMessage(string, int);
-	int UpdateUser(int, string);
+	User& GetUser(unsigned int);
+	int UpdateUser(unsigned int, std::string);
+	User& CreateUser(std::string);
+	User* GetUsersByNick(std::string);
+	Chat& CreateChat(unsigned int,unsigned int,std :: string);
+	Chat& GetChat(unsigned int);
+	Chat* GetAllMyChats (unsigned int);
+	int DeleteChat(unsigned int);
+	Message& SendMessage(Message);
+private:
+	std::string conn;
 };
 

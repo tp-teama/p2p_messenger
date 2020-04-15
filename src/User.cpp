@@ -1,12 +1,21 @@
 #include "User.h"
-std::string& User::GetUser(std::string Nick)
+	User& User::GetUser(unsigned int id)
 {
-	std::string* Ip = new std::string;
-	std::cout << Nick << endl;
-	return Storage::GetUser(Nick);
+	std::cout << id << endl;
+	return;
 }
-int User::UpdateUser(int id_user, std::string path_private_key)
+int User::UpdateUser(unsigned int id_user, std::string path_private_key)
 {
 	std::cout << "New IP is installed succesfully" << endl;
 	return 1;
+}
+User& User::CreateUser(std::string nickname)
+{
+	cout << "I have done user" <<endl;
+	return;
+}
+User* User::GetUsersByNick(std::string nickname)
+{
+	cout << "Users with" << nickname << endl;
+	return;
 }
