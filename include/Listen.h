@@ -8,6 +8,6 @@ using namespace std;
 class Listen{
 private:
 public:
-    Listen() = delete;
+    Listen();
     bool DoListen(Config);
 };

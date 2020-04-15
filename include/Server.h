@@ -5,5 +5,6 @@
 
 class Server{
 public:
+    Server();
     int Run()
 };

@@ -7,3 +7,7 @@ int Server::Run() {
     cout << "run...";
     return 0;
 }
+
+Server::Server() {
+
+}

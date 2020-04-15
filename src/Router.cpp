@@ -12,3 +12,7 @@ int Router::StartRouting() {
     cout << "start routing";
     return 0;
 }
+
+Router::Router() {
+
+}

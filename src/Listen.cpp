@@ -8,3 +8,7 @@ bool Listen::DoListen(Config) {
     return true;
 }
 
+Listen::Listen() {
+
+}
+

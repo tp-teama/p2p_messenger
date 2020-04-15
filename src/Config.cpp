@@ -38,3 +38,7 @@ Config Config::GetConfig(string path) {
     cout << "getting and parsing config";
     return Config("listen", "dbAdress" , 1, "dbName", "dbPassword", "dbUser", "keyPath");
 }
+
+Config::Config() {
+
+}

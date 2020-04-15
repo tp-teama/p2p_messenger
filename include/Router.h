@@ -6,6 +6,7 @@ using namespace std;
 
 class Router{
 public:
+    Router();
     int InitRouter(string);
     int StartRouting();
 };

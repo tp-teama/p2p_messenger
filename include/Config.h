@@ -13,7 +13,7 @@ private:
     string dbUser;
     string privateKeyPath;
 public:
-    Config() = delete;
+    Config();
     Config(string, string, int, string, string, string, string);
     Config GetConfig(string);
     string GetListenPort();
