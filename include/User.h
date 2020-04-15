@@ -11,5 +11,7 @@ public:
 	int UpdateUser(unsigned int, std::string);
 	User& CreateUser(std::string);
 	User* GetUsersByNick(std::string);
+	User();
+	User(std::string, unsigned int);
 };
 

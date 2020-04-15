@@ -19,3 +19,6 @@ User* User::GetUsersByNick(std::string nickname)
 	cout << "Users with" << nickname << endl;
 	return;
 }
+User::User(){
+}
+User::User(std::string nick, unsigned int id): nickname(nick), uuid(id){}
