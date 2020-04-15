@@ -1,12 +1,11 @@
 #include "Storage.h"
 User& Storage::GetUser(unsigned int id)
 {
-	std :: cout << Nick << endl;
+	std :: cout << id << endl;
 	return;
 }
-User& Storage::CreateUser(string Nick)
+User& Storage::CreateUser(std::string Nick)
 {
-
 	std :: cout << "I have create a new user!" << endl;
 	return;
 }
