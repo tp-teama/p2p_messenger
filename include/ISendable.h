@@ -4,5 +4,5 @@ class ISendable {
 public:
     ISendable() {}
     virtual void Send() = 0;
-    virtual ~ISendable();
+    virtual ~ISendable() {}
 };
