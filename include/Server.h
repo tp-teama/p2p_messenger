@@ -15,10 +15,14 @@ public:
             : acceptor(ioService, endp) {
         acceptor.set_option(tcp::acceptor::reuse_address(true));
     }
+    
     void Run();
-    void Accept();
     void Close();
+
 private:
     asio::io_service ioService;
     tcp::acceptor acceptor;
+    std::vector<std::shared_ptr<tcp::socket>> vectorSocket; // client vector
+
+    void accept();
 };
