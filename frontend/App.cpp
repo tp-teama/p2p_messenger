@@ -8,15 +8,13 @@
 // Add chat line generator
 // Add nice corners
 // Refactor code to look pretty
+// Some functions(as utilies as elements) work unefficient
 
-
-#include <iostream>
 #include <string>
 #include <vector>
-#include <iomanip>
-#include <cstring>
-#include <sstream>
 #include <ncurses.h>
+#include "utilities.cpp"
+#include "App.h"
 
 #define HOR ACS_HLINE
 #define VER ACS_VLINE
@@ -24,130 +22,6 @@
 
 using namespace std;
 
-
-char buffer[BUFSIZE];
-
-string trunc(string s, int n){
-	if( int(s.length()) <= n )
-		return s;
-
-	int j;
-	for( j = n-4; s[j] == ' ' && j > 0; --j );
-	s = s.substr(0, j+1) + "...";
-	return s;
-}
-
-
-
-string msg_header(string name, int timestamp){
-	string h(name);
-	h += "   ";
-
-	time_t temp = (uint32_t)timestamp;
-	tm* t = gmtime(&temp);
-	stringstream ss;
-	ss << put_time(t, "%Y-%m-%d %I:%M:%S %p");
-
-	return h + ss.str();;
-}
-
-struct Chat{
-	string name;
-	string last_msg;
-	int members;
-};
-vector<Chat> chats = {
-	{"Chat1", "Hey guys I want whole place search now", 4},
-	{"Chat2", "Come here and fight!", 1},
-	{"Chat3", "Where did you put Bertram's wooden snuff box?", 265}
-};
-int cur_chat = 0;
-
-struct Message{
-	string name;
-	string text;
-	int timestamp;
-};
-vector<Message> msgs = {
-	{"Ilya", "I'm going to create interface", 1589284088},
-	{"Misha", "Natan and me will set up networking", 1589296970},
-	{
-		"Michail", 
-		{
-			"Have you ever though about something big? It gets heavier when "
-			"I pull it up. Sometimes I train so hard I rip the skin!"
-		},
-		1589297462
-	},
-	{
-		"Natan", 
-		{
-			"I suddenly smeared the weekday map\n"
-			"splashing paint from a glass;\n"
-			"On a plate of aspic\n"
-			"I revealed\n"
-			"the ocean's slanted cheek.\n"
-			"On the scales of a tin fish\n"
-		},
-		1589297762
-	},
-	{"Ilya", "I think, these B&W terminal blocks isn't Qt", 1589301142},
-};
-
-
-std::string wrap(const string text, size_t line_length = 72){
-  std::istringstream words(text);
-  std::ostringstream wrapped;
-  std::string word;
-
-  if (words >> word) {
-    wrapped << word;
-    size_t space_left = line_length - word.length();
-    while (words >> word) {
-      if (space_left < word.length() + 1) {
-        wrapped << '\n' << word;
-        space_left = line_length - word.length();
-      } else {
-        wrapped << ' ' << word;
-        space_left -= word.length() + 1;
-      }
-    }
-  }
-  return wrapped.str();
-}
-
-std::vector<std::string> split(const std::string& s, char delimiter){
-   std::vector<std::string> tokens;
-   std::string token;
-   std::istringstream tokenStream(s);
-   while (std::getline(tokenStream, token, delimiter))
-      tokens.push_back(token);
-    
-   return tokens;
-}
-
-std::vector<string> wrap_text(string inp, size_t line_length){
-  std::vector<string> v;
-  std::vector<string> lines = split(inp, '\n');
-  std::vector<string> tmp;
-  for( int i = 0; i < lines.size(); ++i ){
-    tmp = split(wrap(lines[i], line_length), '\n');
-    v.insert(v.end(), tmp.begin(), tmp.end());
-  }
-
-  return v;
-}
-
-void App();
-
-void Panel(int y0, int x0, int height, int width);
-void Chat(int y0, int x0, int height, int width);
-void ChatList(int y0, int x0, int height, int width);
-void JoinButton(int y0, int x0, int height, int width);
-void CreateChat(int y0, int x0, int height, int width);
-void ChatHeader(int y0, int x0, int height, int width);
-void ChatBlock(int y0, int x0, int height, int width);
-void InputField(int y0, int x0, int height, int width);
 
 void App(){
 	initscr();
@@ -232,8 +106,7 @@ void ChatBlock(int y0, int x0, int height, int width){
 	string header;
 	vector<string> lines;
 	int y = y0 + height;
-	cout << msgs.size() << endl;
-	for( int m = msgs.size() - 1; y >= y0 && m >= 0; --m ){
+	for( int m = msgs.size() - 1; y >= y0 && m >= 1; --m ){
 		lines = wrap_text(msgs[m].text, width);
 		for( int l = lines.size() - 1; y >= y0 && l >= 0; --l )
 			mvwaddstr(stdscr, y--, x0, lines[l].c_str());
@@ -244,5 +117,16 @@ void ChatBlock(int y0, int x0, int height, int width){
 				);
 		if(y >= y0)
 			mvwhline(stdscr, y--, x0, '-', width + 1);
+	}
+	// the first one message, that should be bordered above
+	if( y >= y0 ){
+		lines = wrap_text(msgs[0].text, width);
+		for( int l = lines.size() - 1; y >= y0 && l >= 0; --l )
+			mvwaddstr(stdscr, y--, x0, lines[l].c_str());
+		if(y >= y0)
+			mvwaddstr(
+				stdscr, y--, x0 + 2, 
+				msg_header(msgs[0].name, msgs[0].timestamp).c_str()
+				);
 	}
 }
