@@ -101,9 +101,10 @@ void Chat(int y0, int x0, int height, int width){
 void ChatHeader(int y0, int x0, int height, int width){
 	string chat_name = chats[cur_chat].name;
 	int n_mem = chats[cur_chat].members;
-	string members_str = 
-		((n_mem % 1 == 0) && (n_mem % 100 != 11)) ? "member" : "members";
-		
+	string members_str = "member";
+	if( (n_mem % 10 != 1) || (n_mem % 100 == 11) )
+		members_str += "s";
+
 	string header = chat_name + "   " + to_string(n_mem) + " " + members_str;
 
 	mvwaddstr(stdscr, y0, x0 + 1, header.c_str());
