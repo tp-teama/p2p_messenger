@@ -8,3 +8,5 @@ void CreateChat(int y0, int x0, int height, int width);
 void ChatHeader(int y0, int x0, int height, int width);
 void ChatBlock(int y0, int x0, int height, int width);
 void InputField(int y0, int x0, int height, int width);
+void ChatAuth(int y0, int x0, int height, int width);
+void AppAuth(int y0, int x0, int height, int width);
