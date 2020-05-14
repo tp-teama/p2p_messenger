@@ -4,8 +4,8 @@
 const int MAX_CONN = 1;
 
 void Server::Run() {
-        accept();
-        ioService.run();
+    accept();
+    ioService.run();
 }
 
 void Server::Close() {

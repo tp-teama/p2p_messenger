@@ -3,9 +3,12 @@ project(p2p_messenger)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(Boost)
+SET(CMAKE_CXX_FLAGS -pthread)
 
-include_directories(include ${Boost_INCLUDE_DIRS})
+find_package(Boost)
+find_package(Boost REQUIRED COMPONENTS system)
+
+include_directories(include %{Boost_INCLUDE_DIRS})
 
 add_executable(p2p_messenger
         include/CentralServer.h
@@ -32,6 +35,7 @@ add_executable(p2p_messenger
         src/StorageMessage.cpp
         src/StorageUser.cpp
         src/User.cpp
+        CMakeLists.txt
         main.cpp)
 
-target_link_libraries(p2p_messenger ${Boost_LIBRARIES})
+target_link_libraries(p2p_messenger ${Boost_LIBRARIES} Boost::system)

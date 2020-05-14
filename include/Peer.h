@@ -5,7 +5,8 @@
 
 class Peer {
 public:
-    void Connect();
+    Peer(tcp::endpoint);
+    void Connect(std::string, int);
     void Accept();
     void Run();
 protected:
