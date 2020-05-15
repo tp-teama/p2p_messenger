@@ -4,19 +4,21 @@
 
 
 Peer::Peer(tcp::endpoint ep)
-    : server(ep) {
-
-}
+    : server(ep) {}
 
 void Peer::Connect(std::string ip, int port) {
     client.Connect(port, ip);
 }
 
 void Peer::Accept() {
-    server.Run();
+    std::thread threadServerRunning(&Server::Run, &server);
+    threadServerRunning.detach();
 }
 
-void Peer::Run() {
-    Accept();
+void Peer::Send() {
+
 }
 
+void Peer::Receive() {
+
+}

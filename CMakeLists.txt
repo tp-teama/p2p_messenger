@@ -14,7 +14,7 @@ add_executable(p2p_messenger
         include/CentralServer.h
         include/Chat.h
         include/Client.h
-        include/IRecievable.h
+        include/IReceivable.h
         include/ISendable.h
         include/Message.h
         include/Peer.h
