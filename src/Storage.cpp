@@ -83,7 +83,7 @@ int Storage::AddChat(string chat_name, string chat_password) {
         W.exec(sql_chat );
         W.commit();
         cout << "Inserted successfully" << endl;
-        (*database).disconnect();
+        conn.disconnect();
     } catch (const std::exception &e) {
         cerr << e.what() << std::endl;
         return 1;
@@ -146,7 +146,7 @@ int Storage::AddMessage(uint sender_id, uint chat_id, string msg) {
         W.exec(sql_mes );
         W.commit();
         cout << "Inserted successfully" << endl;
-        (*database).disconnect();
+        conn.disconnect();
     } catch (const std::exception &e) {
         cerr << e.what() << std::endl;
         return 1;
