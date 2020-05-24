@@ -1,19 +1,87 @@
 #include <CentralServer.h>
 
-bool CentralServer::AddUser(o_uuid user_id, string ip, string username) {
+void CentralServer::StartServer() {
+    boost::asio::io_service svc;
+    tcp::acceptor a(svc);
+    a.open(tcp::v4());
+    a.set_option(tcp::acceptor::reuse_address(true));
+    a.bind({{}, 5000});
+    a.listen(5);
+    std::shared_ptr<tcp::socket> response_address;
+
+    using session = std::shared_ptr<tcp::socket>;
+    std::function<void()>        do_accept;
+    std::function<void(session)> do_session;
+
+    do_session = [&](session s) {
+        auto buf = std::make_shared<std::vector<char>>(1024);
+        s->async_read_some(boost::asio::buffer(*buf), [&,s,buf](boost::system::error_code ec, size_t bytes) {
+            if (ec) {
+                std::cerr << "read failed: " << ec.message() << "\n";
+            }
+            else {
+                std::cout << "Got message from " << s->remote_endpoint(ec) << ": " ;
+                std::string msg = std::string(buf->data(), bytes);
+
+                std::string str = buf->data();
+                std::string new_str = str.substr(0, str.length() - 2);
+
+                std::cout << "new str is :  " << new_str << std::endl;
+                string resp = ParseRequest(new_str);
+
+                if (ec) {
+                    std::cerr << "endpoint failed: " << ec.message() << "\n";
+                } else {
+                    SendBack(response_address, resp);
+                }
+                do_session(s);
+
+            }
+
+        });
+    };
+
+    do_accept = [&] {
+        auto s = std::make_shared<session::element_type>(svc);
+        a.async_accept(*s, [&,s](boost::system::error_code ec) {
+            if (ec)
+                std::cerr << "accept failed: " << ec.message() << "\n";
+            else {
+                response_address = s;
+                do_session(s);
+                do_accept();
+            }
+        });
+    };
+
+    do_accept(); // кик
+    svc.run();   // ждем закрытия
+}
+
+void CentralServer::SendBack(std::shared_ptr<tcp::socket> resp, string body) {
+
+    async_write(*resp, boost::asio::buffer(body), [&, resp, body](boost::system::error_code ec, size_t) {
+        if (ec) std::cerr << "write failed: " << ec.message() << "\n";
+    });
+}
+
+string CentralServer::AddUser(string ip, string username, string password) {
     if (ip == ""){
-        return false;
+        return "";
     }
 
+    cout << "we are inside" << endl;
     User u;
-    u.public_key = "";
+    u.public_key = password;
     //todo: add public key
     u.ip_adress = ip;
     u.username = username;
-//    o_uuid user_id = b_uuid::random_generator()();
+    u.is_auth = false;
+    o_uuid user_id = b_uuid::random_generator()();
     users.insert(pair<o_uuid, User>(user_id, u));
 
-    return true;
+    string string_id = b_uuid::to_string(user_id);
+    return string_id;
 }
 
 bool CentralServer::UpdateIpAdress(o_uuid user_id, string newIp) {
@@ -23,6 +91,73 @@ bool CentralServer::UpdateIpAdress(o_uuid user_id, string newIp) {
 
     std::map<o_uuid, User>::iterator it = users.find(user_id);
     it->second.ip_adress = newIp;
+    return true;
+}
+
+bool CentralServer::Login(o_uuid user_id, string password) {
+    if (password == ""){
+        return false;
+    }
+
+    std::map<o_uuid, User>::iterator u = users.find(user_id);
+    if (u == users.end()){
+        return false;
+    }
+
+    if (u->second.public_key == password){
+        u->second.is_auth = true;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool CentralServer::Logout(o_uuid user_id) {
+    std::map<o_uuid, User>::iterator u = users.find(user_id);
+    if (u == users.end()){
+        return false;
+    }
+
+    if (u->second.is_auth == false) {
+        return false;
+    } else {
+        u->second.is_auth = false;
+        return true;
+    }
+}
+
+int CentralServer::IsAuth(o_uuid user_id) {
+    std::map<o_uuid, User>::iterator u = users.find(user_id);
+    if (u == users.end()){
+        return -1;
+    }
+
+    if (u->second.is_auth == true) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+User CentralServer::GetUsersByUsername(string username) {
+    if (username == ""){
+        return User{};
+    }
+
+    std::map<o_uuid, User>::iterator it = users.begin();
+    User u;
+
+    while (it != users.end())
+    {
+        if (it->second.username == username) {
+            u = it->second;
+            u.user_id = it->first;
+            return u;
+        }
+        it++;
+    }
+
+    return User{};
 }
 
 User CentralServer::GetUserByID(o_uuid user_id) {
@@ -31,13 +166,120 @@ User CentralServer::GetUserByID(o_uuid user_id) {
     }
 
     User u = users.find(user_id)->second;
+    u.user_id = user_id;
     return u;
 }
 
-void CentralServer::SendBack() {
+string CentralServer::ParseRequest(string req) {
+//command, username, password, user_id, ip
+    req = req + " ";
+    cout << "parsing smth";
+    string username = "", ip = "", password = "", command = "", user_id = "";
+    if (req.find("username:") != string::npos){
+        int pos;
+        pos = req.find("username:");
+        string new_str = req.substr(pos, req.size());
+        username = new_str.substr(sizeof("username"), new_str.find(" ") - sizeof("username"));
+    }
+    if (req.find("command:") != string::npos){
+        int pos;
+        pos = req.find("command:");
+        string new_str = req.substr(pos, req.size());
+        command = new_str.substr(sizeof("command"), new_str.find(" ") - sizeof("command"));
+    }
+    if (req.find("password:") != string::npos){
+        int pos;
+        pos = req.find("password:");
+        string new_str = req.substr(pos, req.size());
+        password = new_str.substr(sizeof("password"), new_str.find(" ") - sizeof("password"));
+    }
+    if (req.find("user_id:") != string::npos){
+        int pos;
+        pos = req.find("user_id:");
+        string new_str = req.substr(pos, req.size());
+        user_id = new_str.substr(sizeof("user_id"), new_str.find(" ") - sizeof("user_id"));
+    }
+    if (req.find("ip:") != string::npos){
+        int pos;
+        pos = req.find("ip:");
+        string new_str = req.substr(pos, req.size());
+        ip = new_str.substr(sizeof("ip"), new_str.find(" ") - sizeof("ip"));
+    }
 
-}
+    cout << "user :" << username << " pass :" << password << " comm :" << command << endl;
+    string response;
 
-void CentralServer::ParseRequest() {
+    if (command == "add_user"){
+        cout << "start adding";
+        string id = AddUser(ip, username, password);
+        response = "user_id:" + id;
+        cout << "adding user with id  " << id;
+    } else if (command == "update_ip"){
+        o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
+        bool res = UpdateIpAdress(uuid_id, ip);
+        if (res) {
+            response = "res:true";
+        } else {
+            response = "res:false";
+        }
+        cout << "updating ip";
+    } else if (command == "login"){
+        cout << "loging";
+        o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
+        bool res = Login(uuid_id, password);
+        if (res) {
+            response = "res:true";
+        } else {
+            response = "res:false";
+        }
+        cout << "login";
+    } else if (command == "logout"){
+        o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
+        bool res = Logout(uuid_id);
+        if (res) {
+            response = "res:true";
+        } else {
+            response = "res:false";
+        }
+        cout << "logout";
+    } else if (command == "get_user_by_id"){
+        o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
+        User u = GetUserByID(uuid_id);
+        string auth;
+        if (u.is_auth) {
+            auth = "true";
+        } else {
+            auth = "false";
+        }
+        response = "user_id:" + b_uuid::to_string(u.user_id) + " username:" + u.username + " is_auth:" + auth + " ip:" + u.ip_adress;
+        cout << "get by id" << "  :   " << uuid_id;
+    } else if (command == "get_user_by_username"){
+        User u = GetUsersByUsername(username);
+        string auth;
+        if (u.is_auth) {
+            auth = "true";
+        } else {
+            auth = "false";
+        }
+        std::cout << "uuid " << u.user_id << std::endl;
+        response = "user_id:" + b_uuid::to_string(u.user_id) + " username:" + u.username + " is_auth:" + auth + " ip:" + u.ip_adress;
+        cout << "get by username";
+    } else if (command == "is_auth"){
+        o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
+        int res = IsAuth(uuid_id);
+        if (res == 1) {
+            response = "res:true";
+        } else if (res == 0){
+            response = "res:false";
+        } else {
+            response = "res:not_found";
+        }
+        cout << "is_auth";
+    } else {
+        cout << "default" << endl;
+    }
 
+    cout << "end";
+
+    return response;
 }
