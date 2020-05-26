@@ -7,6 +7,7 @@
 // Add chat line generator
 // Add nice corners
 // Some functions(as utilies as elements) work unefficient
+// Few key functions: UI update, input, msgs update cos of new msg
 
 #include <string>
 #include <vector>
@@ -17,6 +18,7 @@
 #define HOR ACS_HLINE
 #define VER ACS_VLINE
 #define HOR_SEC '-'
+#define VER_SEC '|'
 #define PSWD_SYM '*'
 
 using namespace std;
@@ -33,7 +35,7 @@ void App(){
 	height--;
 	width--;
 
-	if( 0 ){
+	if( 1 ){
 		AppAuth(0, 0, height, width);
 	} else {
 		Panel(0, 0, height, width/4);
@@ -83,7 +85,7 @@ void CreateChat(int y0, int x0, int height, int width){
 }
 
 void Chat(int y0, int x0, int height, int width){
-	if( 0 ){
+	if( 1 ){
 		ChatAuth(y0, x0, height, width);
 	} else {
 		ChatHeader(y0, x0, 1, width);

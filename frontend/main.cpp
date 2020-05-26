@@ -1,9 +1,10 @@
 #include <iostream>
-#include "App.cpp"
+#include "frontend.cpp"
 
 using namespace std;
 
 
 int main(){
-	App();
+	MessengerUI mui;
+	mui.Run();
 }
