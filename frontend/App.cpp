@@ -8,12 +8,18 @@
 // Add nice corners
 // Some functions(as utilies as elements) work unefficient
 // Few key functions: UI update, input, msgs update cos of new msg
+// Colors
+// Adapt keyboard keys compatibility
+
+#ifndef MESSENGER_FRONTEND
+#define MESSENGER_FRONTEND
 
 #include <string>
 #include <vector>
 #include <ncurses.h>
-#include "utilities.cpp"
 #include "App.h"
+#include "utilities.cpp"
+#include "constants.cpp"
 
 #define HOR ACS_HLINE
 #define VER ACS_VLINE
@@ -24,9 +30,11 @@
 using namespace std;
 
 
-void App(){
-	initscr();
-	curs_set(0);
+void App(bool start, bool end, WindowType app_win, ActionType act){
+	if( start ){
+		initscr();
+		curs_set(0);
+	}
 
 	// let height and width be the last block of each axis position
 	int height = 0;
@@ -35,36 +43,37 @@ void App(){
 	height--;
 	width--;
 
-	if( 1 ){
-		AppAuth(0, 0, height, width);
-	} else {
-		Panel(0, 0, height, width/4);
+	if( app_win == Auth ){
+		AppAuth(0, 0, height, width, app_win, act);
+	}else if( app_win == Welcome ){
+		Greeter(0, 0, height, width, app_win, act);
+	}else{
+		Panel(0, 0, height, width/4, app_win, act);
 
 		mvwvline(stdscr, 0, width/4 + 1, VER, height+1);
 
-		Chat(0, width/4 + 2, height, width - width/4 - 2);
+		Chat(0, width/4 + 2, height, width - width/4 - 2, app_win, act);
 	}
 	
 	wrefresh(stdscr);
 
-	getch();
-
-	endwin();
+	if( end )
+		endwin();
 }
 
-void Panel(int y0, int x0, int height, int width){
-	ChatList(y0, x0, height, width);
+void Panel(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+	ChatList(y0, x0, height, width, app_win, act);
 
 	mvwhline(stdscr, height - 3, 0, HOR, width+1);
 
-	JoinButton(height - 2, 0, 1, width);
+	JoinButton(height - 2, 0, 1, width, app_win, act);
 
 	mvwhline(stdscr, height - 1, 0, HOR, width+1);
 
-	CreateChat(height, 0, 1, width);
+	CreateChat(height, 0, 1, width, app_win, act);
 }
 
-void ChatList(int y0, int x0, int height, int width){
+void ChatList(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
 	for( int i = 0; i < (int)chats.size() && (i+1)*3 < height; ++i ){
 		mvwprintw(stdscr, i*3, 1, trunc(chats[i].name, width).c_str());
 
@@ -75,32 +84,31 @@ void ChatList(int y0, int x0, int height, int width){
 		mvwhline(stdscr, i*3+2, 0, HOR_SEC, width+1);
 	}
 }
-
-void JoinButton(int y0, int x0, int height, int width){
+void JoinButton(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
 	mvwaddstr(stdscr, y0, (width - 8)/2, "Join Chat");
 }
 
-void CreateChat(int y0, int x0, int height, int width){
+void CreateChat(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
 	mvwaddstr(stdscr, y0, (width - 10)/2, "Create Chat");	
 }
 
-void Chat(int y0, int x0, int height, int width){
+void Chat(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
 	if( 1 ){
-		ChatAuth(y0, x0, height, width);
+		ChatAuth(y0, x0, height, width, app_win, act);
 	} else {
-		ChatHeader(y0, x0, 1, width);
+		ChatHeader(y0, x0, 1, width, app_win, act);
 
 		mvwhline(stdscr, y0 + 1, x0, HOR, width + 1);
 
-		ChatBlock(y0 + 2, x0, height - 4, width);
+		ChatBlock(y0 + 2, x0, height - 4, width, app_win, act);
 
 		mvwhline(stdscr, height - 1, x0, HOR, width + 1);
 
-		InputField(height, x0, 1, width);
+		InputField(height, x0, 1, width, app_win, act);
 	}
 }
 
-void ChatHeader(int y0, int x0, int height, int width){
+void ChatHeader(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
 	string chat_name = chats[cur_chat].name;
 	int n_mem = chats[cur_chat].members;
 	string members_str = "member";
@@ -112,11 +120,11 @@ void ChatHeader(int y0, int x0, int height, int width){
 	mvwaddstr(stdscr, y0, x0 + 1, header.c_str());
 }
 
-void InputField(int y0, int x0, int height, int width){
+void InputField(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
 	mvwaddstr(stdscr, y0, x0, "Hello everyone, my name is|");	
 }
 
-void ChatBlock(int y0, int x0, int height, int width){
+void ChatBlock(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
 	string header;
 	vector<string> lines;
 	int y = y0 + height;
@@ -145,7 +153,7 @@ void ChatBlock(int y0, int x0, int height, int width){
 	}
 }
 
-void ChatAuth(int y0, int x0, int height, int width){
+void ChatAuth(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
 	mvwaddstr(
 		stdscr, 
 		y0 + (height - 1)/2 - 1, x0 + (width - 19)/2,
@@ -159,7 +167,10 @@ void ChatAuth(int y0, int x0, int height, int width){
 		);
 }
 
-void AppAuth(int y0, int x0, int height, int width){
+void AppAuth(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+	int len = act.auth.len;
+	int refresh = len + 2;
+
 	mvwaddstr(
 		stdscr, 
 		y0 + (height - 1)/2 - 1, x0 + (width - 22)/2,
@@ -168,7 +179,29 @@ void AppAuth(int y0, int x0, int height, int width){
 
 	mvwhline(
 		stdscr, 
-		y0 + (height - 1)/2 + 1, x0 + (width - 7)/2,
-		PSWD_SYM, 7
+		y0 + (height - 1)/2 + 1, x0 + (width - refresh)/2,
+		' ', refresh
 		);
+	mvwhline(
+		stdscr, 
+		y0 + (height - 1)/2 + 1, x0 + (width - len)/2,
+		PSWD_SYM, len
+		);
+
+	wrefresh(stdscr);
 }
+
+// Transform to more templatable
+void Greeter(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+	wclear(stdscr);	
+
+	mvwaddstr(
+		stdscr, 
+		y0 + (height - 1)/2, x0 + (width - 19)/2,
+		"Welcome back, Cirno"
+		);
+
+	wrefresh(stdscr);
+}
+
+#endif

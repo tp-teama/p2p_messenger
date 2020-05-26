@@ -36,7 +36,7 @@ struct Chat{
 	int members;
 };
 
-vector<Chat> chats = {
+vector<struct Chat> chats = {
 	{"Chat1", "Hey guys I want whole place search now", 4},
 	{"Chat2", "Come here and fight!", 1},
 	{"Chat3", "Where did you put Bertram's wooden snuff box?", 265}
@@ -51,7 +51,7 @@ struct Message{
 	int timestamp;
 };
 
-vector<Message> msgs = {
+vector<struct Message> msgs = {
 	{"Ilya", "I'm going to create interface", 1589284088},
 	{"Misha", "Natan and me will set up networking", 1589296970},
 	{
