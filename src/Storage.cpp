@@ -65,6 +65,10 @@ int Storage::InitDB() {
     return 0;
 }
 
+Chat* Storage::GetUsersChats(uint id) {
+
+}
+
 int Storage::AddChat(string chat_name, string chat_password) {
     string sql_chat;
 

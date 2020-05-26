@@ -25,6 +25,7 @@ public:
     Message GetMsg(uint msg_id);
     int AddChat(string chat_name, string chat_password);
     Chat GetChat(uint id);
+    Chat* GetUsersChats(uint id);
     void CloseDB();
 private:
     pqxx::connection *database;
