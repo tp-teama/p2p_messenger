@@ -19,12 +19,19 @@ using namespace std;
 namespace b_uuid = boost::uuids;
 typedef boost::uuids::uuid o_uuid;
 
+
 struct User{
     o_uuid user_id;
     string public_key;
     string ip_adress;
     string username;
     bool is_auth;
+};
+
+struct Chat{
+    string name;
+    string password;
+    vector<o_uuid> v_users;
 };
 
 class CentralServer{
@@ -39,6 +46,10 @@ public:
     int IsAuth(o_uuid user_id);
     User GetUsersByUsername(string username);
     User GetUserByID(o_uuid user_id);
+    bool JoinChat(string chatname, string password, o_uuid user_id);
+    bool CreateChat(string chatname, string password, o_uuid user_id);
+    string GetChatPort(string chatname, o_uuid id);
 private:
     map<o_uuid , User> users;
+    map<string, Chat> chats;
 };

@@ -70,7 +70,17 @@ string CentralServer::AddUser(string ip, string username, string password) {
         return "";
     }
 
-    cout << "we are inside" << endl;
+    std::map<o_uuid, User>::iterator it = users.begin();
+    User user;
+
+    while (it != users.end())
+    {
+        if (it->second.username == username) {
+            return "";
+        }
+        it++;
+    }
+
     User u;
     u.public_key = password;
     //todo: add public key
@@ -170,16 +180,111 @@ User CentralServer::GetUserByID(o_uuid user_id) {
     return u;
 }
 
+bool CentralServer::JoinChat(string chatname, string password, o_uuid user_id) {
+    if ((chatname == "") || (password == "")){
+        return false;
+    }
+
+    if (chats.find(chatname) == chats.end()){
+        return false;
+    }
+
+    if (users.find(user_id) == users.end()){
+        return false;
+    }
+
+    Chat chat = chats.find(chatname)->second;
+
+    if (chat.password != password){
+        return false;
+    }
+
+
+    std::map<string, Chat>::iterator it = chats.find(chatname);
+    vector<o_uuid> us = it->second.v_users;
+    for(std::vector<o_uuid>::iterator its = us.begin(); its != us.end(); ++its) {
+        if (*its == user_id){
+            return false;
+        }
+    }
+
+    us.push_back(user_id);
+    it->second.v_users = us;
+
+    return true;
+}
+
+bool CentralServer::CreateChat(string chatname, string password, o_uuid user_id) {
+    if ((chatname == "") || (password == "")){
+        return false;
+    }
+
+    if (chats.find(chatname) != chats.end()){
+        return false;
+    }
+
+    if (users.find(user_id) == users.end()){
+        return false;
+    }
+
+    Chat c;
+    c.name = chatname;
+    c.password = password;
+    c.v_users.push_back(user_id);
+    chats.insert(pair<string, Chat>(chatname, c));
+
+    return true;
+}
+
+string CentralServer::GetChatPort(string chatname, o_uuid id) {
+    if (chatname == ""){
+        return "";
+    }
+
+    if (chats.find(chatname) == chats.end()){
+        return "";
+    }
+
+    if (users.find(id) == users.end()){
+        return "";
+    }
+
+    Chat c = chats.find(chatname)->second;
+    vector<o_uuid> us = c.v_users;
+
+    for(std::vector<o_uuid>::iterator it = us.begin(); it != us.end(); ++it) {
+        if (*it != id){
+            o_uuid id = *it;
+            std::map<o_uuid, User>::iterator us = users.find(id);
+            if (us == users.end()){
+                return "";
+            }
+
+            return us->second.ip_adress;
+        }
+    }
+
+    return "";
+}
+
 string CentralServer::ParseRequest(string req) {
 //command, username, password, user_id, ip
     req = req + " ";
     cout << "parsing smth";
-    string username = "", ip = "", password = "", command = "", user_id = "";
+    string username = "", ip = "", password = "", command = "", user_id = "", chat_name = "";
     if (req.find("username:") != string::npos){
         int pos;
         pos = req.find("username:");
         string new_str = req.substr(pos, req.size());
         username = new_str.substr(sizeof("username"), new_str.find(" ") - sizeof("username"));
+    }
+    if (req.find("chat_name:") != string::npos){
+        int pos;
+        pos = req.find("chat_name:");
+        string new_str = req.substr(pos, req.size());
+        chat_name = new_str.substr(sizeof("chat_name"), new_str.find(" ") - sizeof("chat_name"));
+    } else {
+        cout << "chat name is not found ";
     }
     if (req.find("command:") != string::npos){
         int pos;
@@ -206,7 +311,7 @@ string CentralServer::ParseRequest(string req) {
         ip = new_str.substr(sizeof("ip"), new_str.find(" ") - sizeof("ip"));
     }
 
-    cout << "user :" << username << " pass :" << password << " comm :" << command << endl;
+    cout << "user :" << username << " pass :" << password << " comm :" << command << " chat_name :" << chat_name << endl;
     string response;
 
     if (command == "add_user"){
@@ -275,6 +380,29 @@ string CentralServer::ParseRequest(string req) {
             response = "res:not_found";
         }
         cout << "is_auth";
+    } else if (command == "join_chat") {
+        o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
+        bool res = JoinChat(chat_name, password, uuid_id);
+        if (res) {
+            response = "res:true";
+        } else {
+            response = "res:false";
+        }
+        cout << "join chat";
+    } else if (command == "create_chat") {
+        o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
+        bool res = CreateChat(chat_name, password, uuid_id);
+        if (res) {
+            response = "res:true";
+        } else {
+            response = "res:false";
+        }
+        cout << "create chat";
+    } else if (command == "get_chat_name") {
+        o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
+        string res = GetChatPort(chat_name, uuid_id);
+        response = "ip:" + res;
+        cout << "get name chat";
     } else {
         cout << "default" << endl;
     }
