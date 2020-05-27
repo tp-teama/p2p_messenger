@@ -3,15 +3,24 @@ project(p2p_messenger)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(Boost)
+SET(CMAKE_CXX_FLAGS -pthread)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq")
 
-include_directories(include ${Boost_INCLUDE_DIRS})
+set(PQXX /usr/local/include/pqxx)
+
+find_library(PQXX_LIB pqxx)
+find_library(PQ_LIB pq)
+
+find_package(Boost)
+find_package(Boost REQUIRED COMPONENTS system)
+
+include_directories(include %{Boost_INCLUDE_DIRS})
 
 add_executable(p2p_messenger
         include/CentralServer.h
         include/Chat.h
         include/Client.h
-        include/IRecievable.h
+        include/IReceivable.h
         include/ISendable.h
         include/Message.h
         include/Peer.h
@@ -32,6 +41,7 @@ add_executable(p2p_messenger
         src/StorageMessage.cpp
         src/StorageUser.cpp
         src/User.cpp
+        CMakeLists.txt
         main.cpp)
 
-target_link_libraries(p2p_messenger ${Boost_LIBRARIES})
+target_link_libraries(p2p_messenger ${Boost_LIBRARIES} Boost::system ${PQXX_LIB} ${PQ_LIB})
