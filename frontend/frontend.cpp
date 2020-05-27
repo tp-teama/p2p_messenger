@@ -12,9 +12,6 @@ void MessengerUI::Run(){
 	initscr();
 	curs_set(0);
 
-	Action act;
-	App(0, 0, WindowType::Auth, act);
-
 	if( login() ){
 		delwin(stdscr);
 		endwin();

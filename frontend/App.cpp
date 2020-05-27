@@ -11,6 +11,7 @@
 // Colors
 // Adapt keyboard keys compatibility
 // Background color for input
+// Perform in-place coordinate transform and any func 
 
 #ifndef MESSENGER_FRONTEND
 #define MESSENGER_FRONTEND

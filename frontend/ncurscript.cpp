@@ -19,6 +19,9 @@ bool login_try(string& name, string& p455wd, Action& act);
 bool login(){
 	Action act;
 
+	act.type = NoneActionType;
+	App(0, 0, WindowType::Auth, act);
+
 	while( 1 ){
 		string p455wd;
 		string name;
@@ -36,6 +39,9 @@ bool login(){
 		} else {
 			act.type = WrongCredsActionType;
 			App(0, 0, Auth, act);
+			getch();
+			act.type = NoneActionType;
+			App(0, 0, WindowType::Auth, act);
 		}
 	}
 
@@ -52,8 +58,10 @@ bool login_try(string& name, string& p455wd, Action& act){
 
 
 	int cur = 0; // 0 for name, 1 for passwd
+	int cur_chanj;
 
 	while( !status ){
+		cur_chanj = 0;
 		switch( ch = getch() ){
 		case BACKSPACE:
 			if( !name.empty() && !cur )
@@ -66,7 +74,8 @@ bool login_try(string& name, string& p455wd, Action& act){
 			continue;
 		case TAB:
 			cur = !cur;
-			continue;
+			cur_chanj = 1;
+			break;
 		case ESC:
 			return 1;
 		default:
@@ -77,6 +86,7 @@ bool login_try(string& name, string& p455wd, Action& act){
 		act.payload.logact.name = &name;
 		act.payload.logact.psswd = &p455wd;
 		act.payload.logact.cur = cur;
+		act.payload.logact.cur_chanj = cur_chanj;
 	
 		App(0, 0, Auth, act);
 	}

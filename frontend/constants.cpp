@@ -22,6 +22,7 @@ struct LoginAction {
 	std::string* psswd;
 	std::string* name;
 	int cur;
+	int cur_chanj;
 };
 
 enum ActionTypes {
