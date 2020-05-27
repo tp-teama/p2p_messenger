@@ -33,6 +33,5 @@ private:
 
     void accept();
     void handleAccept(const error::error_code&, std::shared_ptr<tcp::socket>);
-    bool Authorize(const o_uuid&, const std::string&);
     void handleRead(const error::error_code&, size_t, const std::string&);
 };

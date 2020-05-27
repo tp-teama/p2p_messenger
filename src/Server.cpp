@@ -17,7 +17,7 @@ void Server::accept() {
     acceptor.listen(MAX_CONN);
     auto socket = std::make_shared<tcp::socket>(ioService);
     acceptor.async_accept(*socket,std::bind(&Server::handleAccept,
-            this, std::placeholders::_1, socket));
+                                            this, std::placeholders::_1, socket));
 }
 
 // "chat_id:id sender_id:id message:msg"
@@ -27,7 +27,7 @@ void Server::handleAccept(const error::error_code& ec, std::shared_ptr<tcp::sock
         std::cout << socket->remote_endpoint() << std::endl;
         std::string msg;
         asio::async_read(*socket, asio::buffer(msg), std::bind(&Server::handleRead,
-                this, std::placeholders::_1, std::placeholders::_2, msg));
+                                                               this, std::placeholders::_1, std::placeholders::_2, msg));
         accept();
     }
 }
