@@ -4,6 +4,8 @@
 #include "Client.h"
 #include "IReceivable.h"
 #include "ISendable.h"
+#include "Message.h"
+#include "Chat.h"
 
 class Peer
         : public ISendable
