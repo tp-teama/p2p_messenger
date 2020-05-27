@@ -4,10 +4,10 @@
 using namespace std;
 
 struct Message{
+//    uint message_id;
     string chat_name;
     string mes;
     string name_sender;
-    int timestamp;
 };
 
 struct Chat{
