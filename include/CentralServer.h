@@ -41,7 +41,7 @@ public:
     bool UpdateIpAdress(o_uuid user_id, string newIp);
     string ParseRequest(string req);
     void SendBack(std::shared_ptr<tcp::socket> resp, string body);
-    bool Login(o_uuid user_id, string password);
+    string Login(string username, string password);
     bool Logout(o_uuid user_id);
     int IsAuth(o_uuid user_id);
     User GetUsersByUsername(string username);

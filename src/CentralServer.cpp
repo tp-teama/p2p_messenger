@@ -104,22 +104,28 @@ bool CentralServer::UpdateIpAdress(o_uuid user_id, string newIp) {
     return true;
 }
 
-bool CentralServer::Login(o_uuid user_id, string password) {
-    if (password == ""){
-        return false;
+string CentralServer::Login(string username, string password) {
+    if (password == "" || username == ""){
+        return "";
     }
 
-    std::map<o_uuid, User>::iterator u = users.find(user_id);
-    if (u == users.end()){
-        return false;
+    std::map<o_uuid, User>::iterator it = users.begin();
+    User u;
+
+    while (it != users.end())
+    {
+        if (it->second.username == username) {
+            if (it->second.public_key == password || it->second.is_auth != true){
+                string id = b_uuid::to_string(it->first);
+                return id;
+            } else {
+                return "";
+            }
+        }
+        it++;
     }
 
-    if (u->second.public_key == password){
-        u->second.is_auth = true;
-        return true;
-    } else {
-        return false;
-    }
+    return "";
 }
 
 bool CentralServer::Logout(o_uuid user_id) {
@@ -330,13 +336,8 @@ string CentralServer::ParseRequest(string req) {
         cout << "updating ip";
     } else if (command == "login"){
         cout << "loging";
-        o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
-        bool res = Login(uuid_id, password);
-        if (res) {
-            response = "res:true";
-        } else {
-            response = "res:false";
-        }
+        string res = Login(username, password);
+        response = "user_id:" + res;
         cout << "login";
     } else if (command == "logout"){
         o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
