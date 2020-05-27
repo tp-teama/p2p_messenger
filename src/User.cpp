@@ -2,15 +2,19 @@
 #include "Chat.h"
 
 
-bool User::auth(std::string password)
+bool User::auth(const std::string& password)
 {
+    if(password.empty())
+    {
+        return false;
+    }
     o_uuid id = this -> user_id;
     std::string login = this->username;
     std::string s = to_string(id);
     bool auth = Authorize(id, password);
     return auth;
 }
-bool User::registration(std::string login,std::string password)
+bool User::registration(const std::string& login,const std::string& password)
 {
     if(login.empty() || password.empty())
     {
@@ -19,7 +23,8 @@ bool User::registration(std::string login,std::string password)
     o_uuid id = boost::uuids::random_generator()();
     std::string s = to_string(id);
     std::string str = to_string(port);
-    std::string init_str = "command:add_user username:" + login + " user_id:" + s + " password:" + password + " port:" + str;
+    std::string init_str = "command:add_user username:" + login + " user_id:" + s
+            + " password:" + password + " port:" + str;
     SendToPort(init_str, 5000);
     return true;
 }
@@ -35,19 +40,30 @@ void User::goodbye()
     o_uuid id = this->user_id;
     std::string s = to_string(id);
     std::string init_str = "command:logout user_id:" + s;
-    std::shared_ptr<Message> mes = std::make_shared<Message>(init_str);
     SendToPort(init_str, 5000);
 }
-vector<Chat> User::get_chats()
+std::vector<Chat> User::get_chats()
 {
     Storage db;
-    vector<Chat> chats = db.getChats();
+    std::vector<Chat> chats = db.GetUsersChats();
+    if(chats.empty())
+    {
+        chats.assign(1,0);
+    }
     return chats;
 }
-vector <Message> User::get_messages(const std::string& chatName)
+std::vector <Message> User::get_messages(const std::string& chatName)
 {
+    if(chatName.empty())
+    {
+        std::vector<Message> messages;
+        std::string error = "error";
+        messages.assign(1,error);
+        return messages;
+    }
     Storage db;
-
+    Chat chat = db.GetChatByName(chatName);
+    std::vector<Message> messages = chat.messages;
 }
 int User::connectChat(const std::string& chatName)
 {
@@ -64,11 +80,11 @@ int User::connectNewChat(const std::string& chatName, const std::string& pass){
             " chat_name:" + chatName + " password:" + pass;
     SendToPort(init_str,5000);
 }
-int User::sendMessage(std::shared_ptr<Message> message, const std::string& chatName)
+bool User::sendMessage(std::shared_ptr<Message> message, const std::string& chatName)
 {
     Storage db;
-    shared_ptr<Chat> chat = make_shared<Chat>(db.GetChatByName(chatName));
-    SendToChat(message, chat);
+    std::shared_ptr<Chat> chat = make_shared<Chat>(db.GetChatByName(chatName));
+    return SendToChat(message, chat, this->user_id);
 }
 int User::acceptMessage(std::shared_ptr<Message> message, std::shared_ptr<Storage>)
 {

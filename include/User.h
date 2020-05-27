@@ -23,16 +23,16 @@ public:
     {
 
     }
-    bool auth(std::string);
-    bool registration( std::string,  std::string);
+    bool auth(const std::string&);
+    bool registration( const std::string&, const std::string&);
     void hi();
     void goodbye();
-    vector<Chat> get_chats();
-    vector <Message> get_messages(const std::string&);
+    std::vector<Chat> get_chats();
+    std::vector <Message> get_messages(const std::string&);
     int connectChat(const std::string&);
     int createChat(const std::string&, const std::string&);
     int connectNewChat(const std::string&, const std::string&);
-    int sendMessage(std::shared_ptr<Message> , const std::string&);
+    bool sendMessage(std::shared_ptr<Message> , const std::string&);
     int acceptMessage(std::shared_ptr<Message>, std::shared_ptr<Storage>);
 private:
     o_uuid user_id;
