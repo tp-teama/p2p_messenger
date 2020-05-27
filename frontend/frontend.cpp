@@ -12,14 +12,15 @@ void MessengerUI::Run(){
 	initscr();
 	curs_set(0);
 
-	ActionType act;
+	Action act;
 	App(0, 0, WindowType::Auth, act);
 
-	if( !login() ){
+	if( login() ){
 		delwin(stdscr);
 		endwin();
 		return;
 	}
+
 	
 	delwin(stdscr);
 	endwin();

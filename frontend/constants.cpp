@@ -1,6 +1,9 @@
 #ifndef CONSTANTS
 #define CONSTANTS
 
+#include <string>
+#include <cstring>
+
 enum WindowType {
 	Auth,
 	ChatLogin,
@@ -15,13 +18,36 @@ enum PanelType {
 	ChatJoin
 };
 
-
-struct AuthAction{
-	int len;
+struct LoginAction {
+	std::string* psswd;
+	std::string* name;
+	int cur;
 };
 
-union ActionType {
-	AuthAction auth;
+enum ActionTypes {
+	NoneActionType,
+	LoginActionType,
+	WelcomeActionType,
+	WrongCredsActionType,
+};
+
+union ActionsPayload {
+	ActionsPayload(){}
+	ActionsPayload(const ActionsPayload& act){memcpy(this, &act, sizeof(act));}
+	ActionsPayload& operator=( const ActionsPayload& act ){ 
+		memcpy(this, &act, sizeof(act)); return *this; 
+	}
+
+	LoginAction logact;
+	std::string name;
+
+	~ActionsPayload(){}
+};
+
+struct Action {
+	Action(): type(NoneActionType) {}
+	ActionsPayload payload;
+	ActionTypes type;
 };
 
 #endif

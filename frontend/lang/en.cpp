@@ -13,4 +13,8 @@
 
 #define ENTER_ACC_PSWD ("Enter account password")
 
+#define ENTER_ACC_NAME ("Enter account name")
+
 #define GREET_MSG(name) ("Welcome back, " name)
+
+#define WRONG_CRED ("Wrong username or password")

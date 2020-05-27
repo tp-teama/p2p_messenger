@@ -10,6 +10,7 @@
 // Few key functions: UI update, input, msgs update cos of new msg
 // Colors
 // Adapt keyboard keys compatibility
+// Background color for input
 
 #ifndef MESSENGER_FRONTEND
 #define MESSENGER_FRONTEND
@@ -29,10 +30,13 @@
 #define VER_SEC '|'
 #define PSWD_SYM '*'
 
+// init_pair(index, foreground, background);
+#define INVERTED 0
+
 using namespace std;
 
 
-void App(bool start, bool end, WindowType app_win, ActionType act){
+void App(bool start, bool end, WindowType app_win, Action act){
 	if( start ){
 		initscr();
 		curs_set(0);
@@ -44,6 +48,7 @@ void App(bool start, bool end, WindowType app_win, ActionType act){
 	getmaxyx(stdscr, height, width);
 	height--;
 	width--;
+
 
 	if( app_win == Auth ){
 		AppAuth(0, 0, height, width, app_win, act);
@@ -63,7 +68,7 @@ void App(bool start, bool end, WindowType app_win, ActionType act){
 		endwin();
 }
 
-void Panel(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+void Panel(int y0, int x0, int height, int width, WindowType app_win, Action act){
 	ChatList(y0, x0, height, width, app_win, act);
 
 	mvwhline(stdscr, height - 3, 0, HOR, width+1);
@@ -75,7 +80,7 @@ void Panel(int y0, int x0, int height, int width, WindowType app_win, ActionType
 	CreateChat(height, 0, 1, width, app_win, act);
 }
 
-void ChatList(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+void ChatList(int y0, int x0, int height, int width, WindowType app_win, Action act){
 	for( int i = 0; i < (int)chats.size() && (i+1)*3 < height; ++i ){
 		mvwprintw(stdscr, i*3, 1, trunc(chats[i].name, width).c_str());
 
@@ -86,15 +91,15 @@ void ChatList(int y0, int x0, int height, int width, WindowType app_win, ActionT
 		mvwhline(stdscr, i*3+2, 0, HOR_SEC, width+1);
 	}
 }
-void JoinButton(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+void JoinButton(int y0, int x0, int height, int width, WindowType app_win, Action act){
 	mvwaddstr(stdscr, y0, (width - strlen(JOIN_CHAT))/2, JOIN_CHAT);
 }
 
-void CreateChat(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+void CreateChat(int y0, int x0, int height, int width, WindowType app_win, Action act){
 	mvwaddstr(stdscr, y0, (width - strlen(CREATE_CHAT))/2, CREATE_CHAT);	
 }
 
-void Chat(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+void Chat(int y0, int x0, int height, int width, WindowType app_win, Action act){
 	if( 1 ){
 		ChatAuth(y0, x0, height, width, app_win, act);
 	} else {
@@ -110,7 +115,7 @@ void Chat(int y0, int x0, int height, int width, WindowType app_win, ActionType 
 	}
 }
 
-void ChatHeader(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+void ChatHeader(int y0, int x0, int height, int width, WindowType app_win, Action act){
 	string chat_name = chats[cur_chat].name;
 	int n_mem = chats[cur_chat].members;
 	string members_str = MEMBERS;
@@ -120,11 +125,11 @@ void ChatHeader(int y0, int x0, int height, int width, WindowType app_win, Actio
 	mvwaddstr(stdscr, y0, x0 + 1, header.c_str());
 }
 
-void InputField(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+void InputField(int y0, int x0, int height, int width, WindowType app_win, Action act){
 	mvwaddstr(stdscr, y0, x0, TEST_MSG);	
 }
 
-void ChatBlock(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+void ChatBlock(int y0, int x0, int height, int width, WindowType app_win, Action act){
 	string header;
 	vector<string> lines;
 	int y = y0 + height;
@@ -153,7 +158,7 @@ void ChatBlock(int y0, int x0, int height, int width, WindowType app_win, Action
 	}
 }
 
-void ChatAuth(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+void ChatAuth(int y0, int x0, int height, int width, WindowType app_win, Action act){
 	mvwaddstr(
 		stdscr, 
 		y0 + (height - 1)/2 - 1, x0 + (width - strlen(ENTER_CHAT_PSWD))/2,
@@ -167,32 +172,101 @@ void ChatAuth(int y0, int x0, int height, int width, WindowType app_win, ActionT
 		);
 }
 
-void AppAuth(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
-	int len = act.auth.len;
-	int refresh = len + 2;
+void AppAuth(int y0, int x0, int height, int width, WindowType app_win, Action act){
 
-	mvwaddstr(
-		stdscr, 
-		y0 + (height - 1)/2 - 1, x0 + (width - strlen(ENTER_ACC_PSWD))/2,
-		ENTER_ACC_PSWD
-		);
+	wclear(stdscr);
 
-	mvwhline(
-		stdscr, 
-		y0 + (height - 1)/2 + 1, x0 + (width - refresh)/2,
-		' ', refresh
-		);
-	mvwhline(
-		stdscr, 
-		y0 + (height - 1)/2 + 1, x0 + (width - len)/2,
-		PSWD_SYM, len
-		);
+	int name_len = 0, psswd_len = 0;
+	string name, psswd;
+	if( act.type == LoginActionType ){
+		name = *act.payload.logact.name;
+		psswd = *act.payload.logact.psswd;
+		psswd_len = !psswd.empty() ? psswd.size() : 0;
+		name_len = name.empty() ? 0 : name.size();
+	}
+
+
+	if( act.type == LoginActionType ){
+		// Name
+		mvwaddstr(
+			stdscr, 
+			y0 + (height - 1)/2 - 4, x0 + (width - strlen(ENTER_ACC_NAME))/2,
+			ENTER_ACC_NAME
+			);
+		mvwhline(
+			stdscr, 
+			y0 + (height - 1)/2 - 2, x0 + (width - name_len - 1)/2,
+			' ', name_len + 2
+			);
+		if( !act.payload.logact.cur ){
+			attron(A_REVERSE);
+			mvwaddstr(
+				stdscr, 
+				y0 + (height - 1)/2 - 2, x0 + (width - name_len)/2,
+				name.c_str()
+				);
+			attroff(A_REVERSE);
+		}
+		else 
+			mvwaddstr(
+				stdscr, 
+				y0 + (height - 1)/2 - 2, x0 + (width - name_len)/2,
+				name.c_str()
+				);
+
+		// Password
+		mvwaddstr(
+			stdscr, 
+			y0 + (height - 1)/2 + 2, x0 + (width - strlen(ENTER_ACC_PSWD))/2,
+			ENTER_ACC_PSWD
+			);
+		mvwhline(
+			stdscr, 
+			y0 + (height - 1)/2 + 4, x0,
+			' ', width
+			);
+		if( act.payload.logact.cur ){
+			attron(A_REVERSE);
+			mvwhline(
+				stdscr, 
+				y0 + (height - 1)/2 + 4, x0 + (width - psswd_len)/2,
+				PSWD_SYM, psswd_len
+				);
+			attroff(A_REVERSE);
+		}
+		else 
+			mvwhline(
+				stdscr, 
+				y0 + (height - 1)/2 + 4, x0 + (width - psswd_len)/2,
+				PSWD_SYM, psswd_len
+				);
+	}else if( act.type == WrongCredsActionType ){
+		mvwaddstr(
+			stdscr, 
+			y0 + (height - 1)/2 - 7, x0 + (width - strlen(WRONG_CRED))/2,
+			WRONG_CRED
+			);
+	}else{
+		// Name
+		mvwaddstr(
+			stdscr, 
+			y0 + (height - 1)/2 - 4, x0 + (width - strlen(ENTER_ACC_NAME))/2,
+			ENTER_ACC_NAME
+			);
+
+		// Password
+		mvwaddstr(
+			stdscr, 
+			y0 + (height - 1)/2 + 2, x0 + (width - strlen(ENTER_ACC_PSWD))/2,
+			ENTER_ACC_PSWD
+			);
+	}
 
 	wrefresh(stdscr);
 }
 
 // Transform to more templatable
-void Greeter(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
+void Greeter(int y0, int x0, int height, int width, WindowType app_win, Action act){
 	wclear(stdscr);	
 
 	mvwaddstr(
