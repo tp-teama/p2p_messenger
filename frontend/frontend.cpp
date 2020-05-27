@@ -3,7 +3,6 @@
 #include "frontend.h"
 #include "App.cpp"
 #include "ncurscript.cpp"
-#include "constants.cpp"
 
 using namespace std;
 

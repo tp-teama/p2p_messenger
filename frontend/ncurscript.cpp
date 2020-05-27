@@ -58,10 +58,8 @@ bool login_try(string& name, string& p455wd, Action& act){
 
 
 	int cur = 0; // 0 for name, 1 for passwd
-	int cur_chanj;
 
 	while( !status ){
-		cur_chanj = 0;
 		switch( ch = getch() ){
 		case BACKSPACE:
 			if( !name.empty() && !cur )
@@ -74,7 +72,6 @@ bool login_try(string& name, string& p455wd, Action& act){
 			continue;
 		case TAB:
 			cur = !cur;
-			cur_chanj = 1;
 			break;
 		case ESC:
 			return 1;
@@ -86,12 +83,57 @@ bool login_try(string& name, string& p455wd, Action& act){
 		act.payload.logact.name = &name;
 		act.payload.logact.psswd = &p455wd;
 		act.payload.logact.cur = cur;
-		act.payload.logact.cur_chanj = cur_chanj;
-	
+
 		App(0, 0, Auth, act);
 	}
 
 	echo();
 }
+
+bool chat_window(){
+	vector<struct Message> msgs = {
+		{"Ilya", "I'm going to create interface", 1589284088},
+		{"Misha", "Natan and me will set up networking", 1589296970},
+		{
+			"Michail",
+			{
+				"Have you ever though about something big? It gets heavier when "
+				"I pull it up. Sometimes I train so hard I rip the skin!"
+			},
+			1589297462
+		},
+		{
+			"Natan",
+			{
+				"I suddenly smeared the weekday map\n"
+				"splashing paint from a glass;\n"
+				"On a plate of aspic\n"
+				"I revealed\n"
+				"the ocean's slanted cheek.\n"
+				"On the scales of a tin fish\n"
+			},
+			1589297762
+		},
+		{"Ilya", "I think, these B&W terminal blocks isn't Qt", 1589301142},
+	};
+
+	vector<struct Chat> chats_v = {
+		{"Chat1", "Hey guys I want whole place search now", 4, msgs},
+		{"Chat2", "Come here and fight!", 1, msgs},
+		{"Chat3", "Where did you put Bertram's wooden snuff box?", 265, msgs}
+	};
+
+	int cur_chat = 0;
+	Action act;
+	act.type = ChatMsgsActionType;
+	ActionsPayload ap;
+	ap.chats = ChatsMsgs(chats_v, cur_chat);
+	act.payload = ap;
+
+	App(0, 0, Default, act);
+	getch();
+	return 0;
+}
+
 
 #endif NCURSCRIPT

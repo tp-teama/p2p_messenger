@@ -4,7 +4,7 @@
 void App(bool start, bool end, WindowType app_win, Action act);
 
 void Panel(int y0, int x0, int height, int width, WindowType app_win, Action act);
-void Chat(int y0, int x0, int height, int width, WindowType app_win, Action act);
+void ChatWindow(int y0, int x0, int height, int width, WindowType app_win, Action act);
 void ChatList(int y0, int x0, int height, int width, WindowType app_win, Action act);
 void JoinButton(int y0, int x0, int height, int width, WindowType app_win, Action act);
 void CreateChat(int y0, int x0, int height, int width, WindowType app_win, Action act);
