@@ -14,12 +14,14 @@
 #ifndef MESSENGER_FRONTEND
 #define MESSENGER_FRONTEND
 
+#include <cstring>
 #include <string>
 #include <vector>
 #include <ncurses.h>
 #include "App.h"
 #include "utilities.cpp"
 #include "constants.cpp"
+#include "lang/en.cpp"
 
 #define HOR ACS_HLINE
 #define VER ACS_VLINE
@@ -85,11 +87,11 @@ void ChatList(int y0, int x0, int height, int width, WindowType app_win, ActionT
 	}
 }
 void JoinButton(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
-	mvwaddstr(stdscr, y0, (width - 8)/2, "Join Chat");
+	mvwaddstr(stdscr, y0, (width - strlen(JOIN_CHAT))/2, JOIN_CHAT);
 }
 
 void CreateChat(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
-	mvwaddstr(stdscr, y0, (width - 10)/2, "Create Chat");	
+	mvwaddstr(stdscr, y0, (width - strlen(CREATE_CHAT))/2, CREATE_CHAT);	
 }
 
 void Chat(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
@@ -111,9 +113,7 @@ void Chat(int y0, int x0, int height, int width, WindowType app_win, ActionType 
 void ChatHeader(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
 	string chat_name = chats[cur_chat].name;
 	int n_mem = chats[cur_chat].members;
-	string members_str = "member";
-	if( (n_mem % 10 != 1) || (n_mem % 100 == 11) )
-		members_str += "s";
+	string members_str = MEMBERS;
 
 	string header = chat_name + "   " + to_string(n_mem) + " " + members_str;
 
@@ -121,7 +121,7 @@ void ChatHeader(int y0, int x0, int height, int width, WindowType app_win, Actio
 }
 
 void InputField(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
-	mvwaddstr(stdscr, y0, x0, "Hello everyone, my name is|");	
+	mvwaddstr(stdscr, y0, x0, TEST_MSG);	
 }
 
 void ChatBlock(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
@@ -156,8 +156,8 @@ void ChatBlock(int y0, int x0, int height, int width, WindowType app_win, Action
 void ChatAuth(int y0, int x0, int height, int width, WindowType app_win, ActionType act){
 	mvwaddstr(
 		stdscr, 
-		y0 + (height - 1)/2 - 1, x0 + (width - 19)/2,
-		"Enter chat password"
+		y0 + (height - 1)/2 - 1, x0 + (width - strlen(ENTER_CHAT_PSWD))/2,
+		ENTER_CHAT_PSWD
 		);
 
 	mvwhline(
@@ -173,8 +173,8 @@ void AppAuth(int y0, int x0, int height, int width, WindowType app_win, ActionTy
 
 	mvwaddstr(
 		stdscr, 
-		y0 + (height - 1)/2 - 1, x0 + (width - 22)/2,
-		"Enter account password"
+		y0 + (height - 1)/2 - 1, x0 + (width - strlen(ENTER_ACC_PSWD))/2,
+		ENTER_ACC_PSWD
 		);
 
 	mvwhline(
@@ -197,8 +197,8 @@ void Greeter(int y0, int x0, int height, int width, WindowType app_win, ActionTy
 
 	mvwaddstr(
 		stdscr, 
-		y0 + (height - 1)/2, x0 + (width - 19)/2,
-		"Welcome back, Cirno"
+		y0 + (height - 1)/2, x0 + (width - strlen(GREET_MSG("Cirno")))/2,
+		GREET_MSG("Cirno")
 		);
 
 	wrefresh(stdscr);
