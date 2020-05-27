@@ -19,6 +19,10 @@ typedef boost::uuids::uuid o_uuid;
 class User: public Peer
 {
 public:
+    User(std::string login, int Port):port(Port), username(login),Peer(tcp::endpoint(tcp::v4(), Port))
+    {
+
+    }
     User(int Port):port(Port),Peer(tcp::endpoint(tcp::v4(), Port))
     {
 
