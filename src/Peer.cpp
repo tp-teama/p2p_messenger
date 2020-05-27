@@ -18,7 +18,7 @@ void Peer::Accept() {
 void Peer::SendToPort(const std::string &request, int port) {
     client.Connect(port);
     client.GetSocket().async_send(asio::buffer(request), std::bind(&Peer::handleSendToPort,
-            this, std::placeholders::_1, std::placeholders::_2, request));
+                                                                   this, std::placeholders::_1, std::placeholders::_2, request));
 }
 
 void Peer::saveChat(const std::string &request) {
@@ -34,7 +34,7 @@ void Peer::handleSendToPort(const error::error_code &ec, size_t bytes, const std
         if (request.find("command:join_chat") != std::string::npos) {
             std::string response;
             client.GetSocket().async_receive(asio::buffer(response), std::bind(&Peer::handleSendToPortReceive,
-                    this, std::placeholders::_1, std::placeholders::_2, response, request));
+                                                                               this, std::placeholders::_1, std::placeholders::_2, response, request));
 
         } else if (request.find("command:create_chat") != std::string::npos) {
             saveChat(request);
@@ -62,7 +62,7 @@ bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> ch
         return false;
     }
     std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + to_string(uuid)
-            + " message:" + message->msg;
+                                 + " message:" + message->msg;
     SendToPort(requestMessage, port);
     return true;
 }
@@ -86,30 +86,4 @@ std::string Peer::Registration(const std::string& request) {
     std::string response;
     client.GetSocket().receive(asio::buffer(response));
     return response.substr(response.find(':') + 1, response.length());
-}
-#include "Peer.h"
-#include <thread>
-#include <future>
-
-void Peer::Connect(int port, std::string Ip)
-{
-    client.Connect(port, Ip);
-}
-void Peer::Accept()
-{
-    server.Run();
-}
-void Peer::Run() {
-    std::thread thr(&Peer::Accept, this);
-    thr.detach();
-    std::cout << "Lol";
-}
-
-
-int  main()
-{
-    tcp::endpoint ep(tcp::v4(), 5000);
-    Peer peer(ep);
-    peer.Run();
-    return 0;
 }
