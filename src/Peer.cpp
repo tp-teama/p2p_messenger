@@ -62,7 +62,7 @@ bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> ch
         return false;
     }
     std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + to_string(uuid)
-            + " message:" + message->mes;
+            + " message:" + message->msg;
     SendToPort(requestMessage, port);
     return true;
 }
@@ -71,11 +71,19 @@ void Peer::Receive() {
 
 }
 
-bool Peer::Authorize(const o_uuid& uuid, const std::string& password) {
-    std::string request = "command:login user_id:" + to_string(uuid) + " password:" + password;
+std::string Peer::Authorize(const std::string& login, const std::string& password) {
+    std::string request = "command:login user_name:" + login + " password:" + password;
     client.Connect(5000);
     client.GetSocket().send(asio::buffer(request));
     std::string response;
     client.GetSocket().receive(asio::buffer(response));
-    return response == "res:true";
+    return response.substr(response.find(':') + 1, response.length());
+}
+
+std::string Peer::Registration(const std::string& request) {
+    client.Connect(5000);
+    client.GetSocket().send(asio::buffer(request));
+    std::string response;
+    client.GetSocket().receive(asio::buffer(response));
+    return response.substr(response.find(':') + 1, response.length());
 }
