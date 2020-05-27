@@ -12,6 +12,11 @@ public:
     Peer(tcp::endpoint);
     virtual ~Peer();
     void Connect(int);
+    Peer(tcp::endpoint ep): server(ep), client()
+    {
+
+    }
+    void Connect(int, std::string);
     void Accept();
     void SendToPort(const std::string&, int port) override;
     bool SendToChat(std::shared_ptr<Message> msg, std::shared_ptr<Chat>, const o_uuid&);

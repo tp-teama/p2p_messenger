@@ -26,9 +26,6 @@ add_executable(p2p_messenger
         include/Peer.h
         include/Server.h
         include/Storage.h
-        include/StorageChat.h
-        include/StorageMessage.h
-        include/StorageUser.h
         include/User.h
         src/CentralServer.cpp
         src/Chat.cpp
@@ -37,9 +34,6 @@ add_executable(p2p_messenger
         src/Peer.cpp
         src/Server.cpp
         src/Storage.cpp
-        src/StorageChat.cpp
-        src/StorageMessage.cpp
-        src/StorageUser.cpp
         src/User.cpp
         CMakeLists.txt
         main.cpp)
