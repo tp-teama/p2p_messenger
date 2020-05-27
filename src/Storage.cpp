@@ -172,9 +172,9 @@ Chat Storage::GetChatByName(string chat_name) {
 
         for (pqxx::result::const_iterator c = R.begin(); c != R.end(); ++c) {
             Message msg;
-            msg.message_id = c[0].as<int>();
-            msg.msg = c[1].as<string>();
-            msg.sender = c[2].as<string>();
+//            msg.message_id = c[0].as<int>();
+            msg.mes = c[1].as<string>();
+            msg.name_sender = c[2].as<string>();
             msg.chat_name = c[3].as<string>();
             msgs.push_back(msg);
         }
@@ -272,9 +272,9 @@ Message Storage::GetMsg(uint msg_id) {
         pqxx::result R( N.exec( sql ));
 
         for (pqxx::result::const_iterator c = R.begin(); c != R.end(); ++c) {
-            msg.message_id = c[0].as<int>();
-            msg.msg = c[1].as<string>();
-            msg.sender = c[2].as<string>();
+//            msg.message_id = c[0].as<int>();
+            msg.mes = c[1].as<string>();
+            msg.name_sender = c[2].as<string>();
             msg.chat_name = c[3].as<string>();
         }
         cout << "Select success" << endl;
@@ -304,9 +304,9 @@ Message Storage::GetLastMsg(string chat_name) {
         pqxx::result R( N.exec( sql ));
 
         for (pqxx::result::const_iterator c = R.begin(); c != R.end(); ++c) {
-            msg.message_id = c[0].as<int>();
-            msg.msg = c[1].as<string>();
-            msg.sender = c[2].as<string>();
+//            msg.message_id = c[0].as<int>();
+            msg.mes = c[1].as<string>();
+            msg.name_sender = c[2].as<string>();
             msg.chat_name = c[3].as<string>();
         }
         cout << "Select success" << endl;
