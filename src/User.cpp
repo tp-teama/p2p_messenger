@@ -8,11 +8,13 @@ bool User::auth(const std::string& password)
     {
         return false;
     }
-    o_uuid id = this -> user_id;
-    std::string login = this->username;
-    std::string s = to_string(id);
-    bool auth = Authorize(id, password);
-    return auth;
+    std:string id = Authorize(this->username, password);
+    if(id.empty())
+    {
+        return false;
+    }
+    this->user_id = boost::lexical_cast<o_uuid>(id);
+    return true;
 }
 bool User::registration(const std::string& login,const std::string& password)
 {
@@ -20,19 +22,25 @@ bool User::registration(const std::string& login,const std::string& password)
     {
         return false;
     }
-    o_uuid id = boost::uuids::random_generator()();
-    std::string s = to_string(id);
+//    o_uuid id = boost::uuids::random_generator()();
     std::string str = to_string(port);
-    std::string init_str = "command:add_user username:" + login + " user_id:" + s
-            + " password:" + password + " port:" + str;
-    SendToPort(init_str, 5000);
+    std::string init_str = "command:add_user username:" + login +
+            " password:" + password + " ip:" + str;
+//    SendToPort(init_str, 5000);
+    std::string id = Registration(init_str);
+    if(id.empty())
+    {
+        return false;
+    }
+    this->user_id = boost::lexical_cast<o_uuid>(id);
+    this->username = login;
     return true;
 }
 void User::hi(){
     o_uuid id = this->user_id;
     std::string s = to_string(id);
     std::string str = to_string(port);
-    std::string init_str = "command:update_ip user_id:" + s + " port:" + str;
+    std::string init_str = "command:update_ip user_id:" + s + " ip:" + str;
     SendToPort(init_str, 5000);
 }
 void User::goodbye()
