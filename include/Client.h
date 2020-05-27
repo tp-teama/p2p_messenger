@@ -12,9 +12,12 @@ using boost::asio::streambuf;
 class Client {
 public:
     Client();
-    void Connect(int, std::string);
+    void Connect(int);
     void Close();
+    tcp::socket& GetSocket();
 private:
     asio::io_service service;
     tcp::socket sock;
+
+    void handleConnect(const error_code&);
 };
