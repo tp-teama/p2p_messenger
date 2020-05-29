@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.10.2)
 project(p2p_messenger)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 SET(CMAKE_CXX_FLAGS -pthread)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq")
@@ -17,7 +17,6 @@ find_package(Boost REQUIRED COMPONENTS system)
 include_directories(include %{Boost_INCLUDE_DIRS})
 
 add_executable(p2p_messenger
-        include/CentralServer.h
         include/Chat.h
         include/Client.h
         include/IReceivable.h
@@ -27,7 +26,6 @@ add_executable(p2p_messenger
         include/Server.h
         include/Storage.h
         include/User.h
-        src/CentralServer.cpp
         src/Chat.cpp
         src/Client.cpp
         src/Message.cpp

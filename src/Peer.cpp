@@ -32,9 +32,9 @@ void Peer::saveChat(const std::string &request) {
 void Peer::handleSendToPort(const error::error_code &ec, size_t bytes, const std::string &request) {
     if (!ec) {
         if (request.find("command:join_chat") != std::string::npos) {
-            std::string response;
-            client.GetSocket().async_receive(asio::buffer(response), std::bind(&Peer::handleSendToPortReceive,
-                                                                               this, std::placeholders::_1, std::placeholders::_2, response, request));
+            auto buf = std::make_shared<std::vector<char>>(1024);
+            client.GetSocket().async_receive(asio::buffer(*buf), std::bind(&Peer::handleSendToPortReceive,
+                                                                               this, std::placeholders::_1, std::placeholders::_2, buf->data(), request));
 
         } else if (request.find("command:create_chat") != std::string::npos) {
             saveChat(request);
@@ -55,14 +55,15 @@ bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> ch
     std::string request = "command:get_chat_name chat_name:" + chat->name + " user_id:" + to_string(uuid);
     client.Connect(5000);
     client.GetSocket().send(asio::buffer(request));
-    std::string response;
-    client.GetSocket().receive(asio::buffer(response));
+    auto buf = std::make_shared<std::vector<char>>(1024);
+    client.GetSocket().receive(asio::buffer(*buf));
+    std::string response = buf->data();
     int port = stoi(response.substr(response.find(':') + 1, response.length()));
     if (!port) {
         return false;
     }
     std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + to_string(uuid)
-                                 + " message:" + message->msg;
+                                 + " message:" + message->mes;
     SendToPort(requestMessage, port);
     return true;
 }
@@ -72,18 +73,21 @@ void Peer::Receive() {
 }
 
 std::string Peer::Authorize(const std::string& login, const std::string& password) {
-    std::string request = "command:login user_name:" + login + " password:" + password;
+    std::string request = "command:login username:" + login + " password:" + password;
     client.Connect(5000);
     client.GetSocket().send(asio::buffer(request));
-    std::string response;
-    client.GetSocket().receive(asio::buffer(response));
+    auto buf = std::make_shared<std::vector<char>>(1024);
+    client.GetSocket().receive(asio::buffer(*buf));
+    std::string response = buf->data();
     return response.substr(response.find(':') + 1, response.length());
 }
 
 std::string Peer::Registration(const std::string& request) {
     client.Connect(5000);
     client.GetSocket().send(asio::buffer(request));
-    std::string response;
-    client.GetSocket().receive(asio::buffer(response));
+    auto buf = std::make_shared<std::vector<char>>(1024);
+    client.GetSocket().receive(asio::buffer(*buf));
+    std::string response = buf->data();
     return response.substr(response.find(':') + 1, response.length());
 }
+// трехтысячный порт ввели

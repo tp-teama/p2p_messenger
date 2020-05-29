@@ -16,7 +16,7 @@ tcp::socket& Client::GetSocket() {
     return sock;
 }
 
-void Client::handleConnect(const error_code& ec) {
+void Client::handleConnect(const error::error_code& ec) {
     if (!ec) {
         std::cout << sock.remote_endpoint();
     }
