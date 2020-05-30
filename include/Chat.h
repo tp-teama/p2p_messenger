@@ -1,8 +1,7 @@
 #pragma once
 #include <iostream>
-#include "Client.h"
-#include "User.h"
 #include "Message.h"
+#include <vector>
 
 struct Chat{
     std::vector<Message> messages;
