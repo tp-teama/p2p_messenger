@@ -6,7 +6,7 @@
 namespace asio =  boost::asio;
 namespace ip = boost::asio::ip;
 using boost::asio::ip::tcp;
-using boost::system::error_code;
+namespace error = boost::system;
 using boost::asio::streambuf;
 
 class Client {
@@ -19,5 +19,5 @@ private:
     asio::io_service service;
     tcp::socket sock;
 
-    void handleConnect(const error_code&);
+    void handleConnect(const error::error_code&);
 };
