@@ -17,38 +17,25 @@ void Peer::Accept() {
 
 void Peer::SendToPort(const std::string &request, int port) {
     client.Connect(port);
-    client.GetSocket().async_send(asio::buffer(request), std::bind(&Peer::handleSendToPort,
-                                                                   this, std::placeholders::_1, std::placeholders::_2, request));
+    client.GetSocket().send(asio::buffer(request));
+    if (request.find("command:join_chat") != std::string::npos) {
+        auto buf = std::make_shared<std::vector<char>>(1024);
+        client.GetSocket().receive(asio::buffer(*buf));
+        std::string response = buf->data();
+        if (response == "res:true") {
+            saveChat(request);
+        }
+    } else if (request.find("command:create_chat") != std::string::npos) {
+        saveChat(request);
+    }
+    client.Close();
 }
 
 void Peer::saveChat(const std::string &request) {
     Storage db;
     std::string info = request.substr(request.find("chat_name:"), request.find(" password:"));
-    db.AddChat(info.substr(info.find(':'), info.find(' ')),
-               info.substr(info.substr(info.find("password:"),
-                                       info.length()).find(':') + 1, info.length()));
-}
-
-void Peer::handleSendToPort(const error::error_code &ec, size_t bytes, const std::string &request) {
-    if (!ec) {
-        if (request.find("command:join_chat") != std::string::npos) {
-            auto buf = std::make_shared<std::vector<char>>(1024);
-            client.GetSocket().async_receive(asio::buffer(*buf), std::bind(&Peer::handleSendToPortReceive,
-                                                                               this, std::placeholders::_1, std::placeholders::_2, buf->data(), request));
-
-        } else if (request.find("command:create_chat") != std::string::npos) {
-            saveChat(request);
-        }
-    }
-}
-
-void Peer::handleSendToPortReceive(const error::error_code& ec, size_t bytes,
-                                   const std::string& response, const std::string& request) {
-    if (!ec) {
-        if (response == "res:true") {
-            saveChat(request);
-        }
-    }
+    db.AddChat(info.substr(info.find(':') + 1, info.find(" password:") - info.find(':') - 1),
+               info.substr(info.find(' ')).substr(info.find(':') + 1));
 }
 
 bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> chat, const o_uuid& uuid) {
@@ -64,6 +51,7 @@ bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> ch
     }
     std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + to_string(uuid)
                                  + " message:" + message->mes;
+    client.Close();
     SendToPort(requestMessage, port);
     return true;
 }
@@ -79,6 +67,7 @@ std::string Peer::Authorize(const std::string& login, const std::string& passwor
     auto buf = std::make_shared<std::vector<char>>(1024);
     client.GetSocket().receive(asio::buffer(*buf));
     std::string response = buf->data();
+    client.Close();
     return response.substr(response.find(':') + 1, response.length());
 }
 
@@ -88,6 +77,7 @@ std::string Peer::Registration(const std::string& request) {
     auto buf = std::make_shared<std::vector<char>>(1024);
     client.GetSocket().receive(asio::buffer(*buf));
     std::string response = buf->data();
+    client.Close();
     return response.substr(response.find(':') + 1, response.length());
 }
 // трехтысячный порт ввели
