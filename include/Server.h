@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <boost/asio.hpp>
+#include <boost/asio/buffer.hpp>
 #include <memory>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>

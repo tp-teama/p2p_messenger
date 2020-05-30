@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "Client.h"
 #include "Message.h"
 #include <vector>
 

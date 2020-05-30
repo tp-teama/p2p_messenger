@@ -25,7 +25,7 @@ bool User::registration(const std::string& login,const std::string& password)
 //    o_uuid id = boost::uuids::random_generator()();
     std::string str = to_string(port);
     std::string init_str = "command:add_user username:" + login +
-            " password:" + password + " ip:" + str;
+                           " password:" + password + " ip:" + str;
 //    SendToPort(init_str, 5000);
     std::string id = Registration(init_str);
     if(id.empty())
@@ -33,6 +33,7 @@ bool User::registration(const std::string& login,const std::string& password)
         return false;
     }
     this->user_id = boost::lexical_cast<o_uuid>(id);
+    std::cout << id << std::endl;
     this->username = login;
     return true;
 }
@@ -81,12 +82,12 @@ int User::connectChat(const std::string& chatName)
 int User::createChat(const std::string& chatName, const std::string& pass) {
     std::string init_str = "command:create_chat user_id:" + to_string(this->user_id) +
                            " chat_name:" + chatName + " password:" + pass;
-    SendToPort(init_str,5000);
+    SendToPort(init_str,5000);//вопрос по БД
 }
 int User::connectNewChat(const std::string& chatName, const std::string& pass){
     std::string init_str = "command:join_chat user_id:" + to_string(this->user_id) +
-            " chat_name:" + chatName + " password:" + pass;
-    SendToPort(init_str,5000);
+                           " chat_name:" + chatName + " password:" + pass;
+    SendToPort(init_str,5000);// опрос по БД
 }
 bool User::sendMessage(std::shared_ptr<Message> message, const std::string& chatName)
 {
@@ -94,7 +95,7 @@ bool User::sendMessage(std::shared_ptr<Message> message, const std::string& chat
     std::shared_ptr<Chat> chat = make_shared<Chat>(db.GetChatByName(chatName));
     return SendToChat(message, chat, this->user_id);
 }
-int User::acceptMessage(std::shared_ptr<Message> message, std::shared_ptr<Storage>)
-{
-
-}
+//int User::acceptMessage(std::shared_ptr<Message> message, std::shared_ptr<Storage>)
+//{
+//
+//}
