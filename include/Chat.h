@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include "Client.h"
-#include "User.h"
 #include "Message.h"
 
 struct Chat{

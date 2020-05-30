@@ -6,10 +6,11 @@
 #include <memory>
 #include <vector>
 #include "Peer.h"
+#include <boost/asio/buffer.hpp>
 #include <boost/uuid/uuid.hpp>            // uuid class
 #include <boost/uuid/uuid_generators.hpp> // generators
 #include <boost/uuid/uuid_io.hpp>
-     // streaming operators etc.
+// streaming operators etc.
 #include <boost/lexical_cast.hpp>
 
 namespace b_uuid = boost::uuids;
@@ -37,7 +38,7 @@ public:
     int createChat(const std::string&, const std::string&);
     int connectNewChat(const std::string&, const std::string&);
     bool sendMessage(std::shared_ptr<Message> , const std::string&);
-    int acceptMessage(std::shared_ptr<Message>, std::shared_ptr<Storage>);
+//    int acceptMessage(std::shared_ptr<Message>, std::shared_ptr<Storage>);
 private:
     o_uuid user_id;
     int port;

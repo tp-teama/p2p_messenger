@@ -1,10 +1,24 @@
 #pragma once
 #include <iostream>
 #include <pqxx/pqxx>
-#include "Message.h"
 #include "Chat.h"
 
 using namespace std;
+
+//struct Message{
+////    uint message_id;
+//    string chat_name;
+//    string mes;
+//    string name_sender;
+//};
+//
+//struct Chat{
+//    uint chat_id;
+//    string name;
+//    string password;
+//    vector<Message> messages;
+//};
+
 
 class Storage{
 public:

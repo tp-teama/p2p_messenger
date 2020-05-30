@@ -2,6 +2,7 @@
 #include "Storage.h"
 #include <boost/lexical_cast.hpp>
 
+
 const int MAX_CONN = 1;
 
 void Server::Run() {
@@ -27,10 +28,11 @@ void Server::handleAccept(const error::error_code& ec, std::shared_ptr<tcp::sock
         std::cout << socket->remote_endpoint() << std::endl;
         auto buf = std::make_shared<std::vector<char>>(1024);
         asio::async_read(*socket, asio::buffer(*buf), std::bind(&Server::handleRead,
-                                                               this, std::placeholders::_1, std::placeholders::_2, buf->data()));
+                                                                this, std::placeholders::_1, std::placeholders::_2, buf->data()));
         accept();
     }
 }
+
 
 void Server::handleRead(const error::error_code& ec, size_t bytes, const std::string& msg) {
     if (!ec) {
