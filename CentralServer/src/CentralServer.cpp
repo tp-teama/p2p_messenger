@@ -1,5 +1,7 @@
 #include "CentralServer.h"
 
+bool SymbolCheck(char c);
+
 void CentralServer::StartServer() {
     boost::asio::io_service svc;
     tcp::acceptor a(svc);
@@ -24,9 +26,13 @@ void CentralServer::StartServer() {
                 std::string msg = std::string(buf->data(), bytes);
 
                 std::string str = buf->data();
-                std::string new_str = str.substr(0, str.length() - 2);
-
-                std::cout << "new str is :  " << new_str << std::endl;
+                int i = 0;
+                while (!SymbolCheck(str[str.length() - 1 - i])){
+                    i++;
+                }
+                std::string new_str = str.substr(0, str.length() - i);
+                std::cout << std::endl << "new str is :  " << new_str << "|" << "i is " << i << std::endl;
+                std::cout << "symbol chack is " << (new_str[new_str.length() - 1]) << (new_str[new_str.length() - 2]) << (new_str[new_str.length() - 0]) << new_str[0] << "------------------";
                 string resp = ParseRequest(new_str);
 
                 if (ec) {
@@ -289,8 +295,6 @@ string CentralServer::ParseRequest(string req) {
         pos = req.find("chat_name:");
         string new_str = req.substr(pos, req.size());
         chat_name = new_str.substr(sizeof("chat_name"), new_str.find(" ") - sizeof("chat_name"));
-    } else {
-        cout << "chat name is not found ";
     }
     if (req.find("command:") != string::npos){
         int pos;
@@ -349,6 +353,7 @@ string CentralServer::ParseRequest(string req) {
         }
         cout << "logout";
     } else if (command == "get_user_by_id"){
+        cout << "user_id in string:   " << user_id << "|" << endl;
         o_uuid uuid_id = boost::lexical_cast<o_uuid>(user_id);
         User u = GetUserByID(uuid_id);
         string auth;
@@ -411,4 +416,14 @@ string CentralServer::ParseRequest(string req) {
     cout << "end";
 
     return response;
+}
+
+bool SymbolCheck(char c){
+    if (isalnum(c)){
+        return true;
+    }
+    if (c == '-' || c == '_'){
+        return true;
+    }
+    return false;
 }

@@ -8,6 +8,10 @@
 #include <iostream>
 #include <vector>
 #include <boost/lexical_cast.hpp>
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
+
 
 using boost::asio::ip::tcp;
 using boost::system::error_code;
@@ -18,7 +22,6 @@ using namespace std;
 
 namespace b_uuid = boost::uuids;
 typedef boost::uuids::uuid o_uuid;
-
 
 struct User{
     o_uuid user_id;

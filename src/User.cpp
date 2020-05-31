@@ -78,16 +78,19 @@ int User::connectChat(const std::string& chatName)
 {
     Storage db;
     Chat chat = db.GetChatByName(chatName);
+    return 0;
 }
 int User::createChat(const std::string& chatName, const std::string& pass) {
     std::string init_str = "command:create_chat user_id:" + to_string(this->user_id) +
                            " chat_name:" + chatName + " password:" + pass;
     SendToPort(init_str,5000);//вопрос по БД
+    return 0;
 }
 int User::connectNewChat(const std::string& chatName, const std::string& pass){
     std::string init_str = "command:join_chat user_id:" + to_string(this->user_id) +
                            " chat_name:" + chatName + " password:" + pass;
     SendToPort(init_str,5000);// опрос по БД
+    return 0;
 }
 bool User::sendMessage(std::shared_ptr<Message> message, const std::string& chatName)
 {
