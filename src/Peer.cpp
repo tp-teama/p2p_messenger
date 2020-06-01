@@ -15,7 +15,7 @@ void Peer::Accept() {
     threadServerRunning.detach();
 }
 
-void Peer::SendToPort(const std::string &request, int port) {
+bool Peer::SendToPort(const std::string &request, int port) {
     client.Connect(port);
     client.GetSocket().send(asio::buffer(request));
     if (request.find("command:join_chat") != std::string::npos) {
@@ -24,11 +24,17 @@ void Peer::SendToPort(const std::string &request, int port) {
         std::string response = buf->data();
         if (response == "res:true") {
             saveChat(request);
+            client.Close();
+            return true;
         }
+        client.Close();
+        return false;
     } else if (request.find("command:create_chat") != std::string::npos) {
         saveChat(request);
+        return true;
     }
     client.Close();
+    return false;
 }
 
 void Peer::saveChat(const std::string &request) {

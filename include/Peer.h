@@ -14,7 +14,7 @@ public:
     Peer(tcp::endpoint);
     virtual ~Peer();
     void Accept();
-    void SendToPort(const std::string&, int port) override;
+    bool SendToPort(const std::string&, int port) override;
     bool SendToChat(std::shared_ptr<Message> msg, std::shared_ptr<Chat>, const o_uuid&);
     void Receive() override;
     std::string Authorize(const std::string& login, const std::string& password);

@@ -5,6 +5,6 @@
 class ISendable {
 public:
     ISendable() {}
-    virtual void SendToPort(const std::string&, int) = 0;
+    virtual bool SendToPort(const std::string&, int) = 0;
     virtual ~ISendable() {}
 };

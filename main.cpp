@@ -11,6 +11,7 @@ int main() {
     char go = 'd';
     Storage s = Storage();
     s.Connect();
+//    s.InitDB();
     while(go != 'o') {
         std::cout << "Введи действие reg/auth" << std::endl;
         std::cin >> go;
@@ -29,7 +30,7 @@ int main() {
             nathan.hi();
             while(go != 'o')
             {
-                std::cout << "Введи действие create_chat/join_chat" << std::endl;
+                std::cout << "Введи действие create_chat/join_chat/send_mes_in_chat" << std::endl;
                 std::cin >> go;
                 if(go == 'c')
                 {
@@ -57,6 +58,19 @@ int main() {
                         chats.pop_back();
                     }
 
+                }
+                if(go == 's')
+                {
+                    std::cout << "Введи сообщение и чат, в который хочешь отправить" << std::endl;
+                    std::string mes, chat;
+                    std::cin >> mes >> chat;
+                    nathan.sendMessage(make_shared<Message>(mes), chat);
+                    std::vector<Message> chats = nathan.get_messages(chat);
+                    while(!chats.empty())
+                    {
+                        std::cout << chats.back().mes << std::endl;
+                        chats.pop_back();
+                    }
                 }
 
             }
