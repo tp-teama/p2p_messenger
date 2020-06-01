@@ -5,13 +5,13 @@
 #include <cstring>
 #include <vector>
 
-struct Message{
+struct Message {
 	std::string name;
 	std::string text;
 	int timestamp;
 };
 
-struct Chat{
+struct Chat {
 	std::string name;
 	std::string last_msg;
 	int members;
@@ -22,14 +22,12 @@ enum WindowType {
 	Auth,
 	ChatLogin,
 	Welcome,
-	Default
-};
-
-enum PanelType {
-	Chats,
-	Messages,
-	ChatCreation,
-	ChatJoin
+	Default,
+	Input,
+	JoinArea,
+	CreateArea,
+	ChatListArea,
+	ChatListChatBlockArea
 };
 
 enum ActionTypes {
@@ -37,39 +35,48 @@ enum ActionTypes {
 	LoginActionType,
 	WelcomeActionType,
 	WrongCredsActionType,
-	ChatMsgsActionType
+	DispChMsgActionType,
+	UpdMsgActionType,
+	FocusActionType,
+	UnfocusActionType
 };
 
 struct LoginAction {
 	std::string* psswd;
 	std::string* name;
 	int cur;
-} logact;
+};
 
-struct ChatsMsgs{
-	ChatsMsgs(){}
-	ChatsMsgs(std::vector<Chat> v, int c): chat_v(v), cur_chat(c) {}
+struct FocAction {
+	FocAction(){}
+	FocAction(int num, std::vector<Chat> v): num(num), v(v){}
+	FocAction(const FocAction& fa): num(fa.num), v(fa.v) {}
 
-	std::vector<Chat> chat_v;
-	int cur_chat;
-} chats;
+	int num;
+	std::vector<Chat> v;
+};
 
 union ActionsPayload {
 	ActionsPayload(){}
 	ActionsPayload(const ActionsPayload& act){memcpy(this, &act, sizeof(act));}
-	ActionsPayload& operator=( const ActionsPayload& act ){ 
+	ActionsPayload& operator=( const ActionsPayload& act ){
 		memcpy(this, &act, sizeof(act));
 		return *this; 
 	}
+	ActionsPayload(const FocAction fa): ua(fa) {}
 
 	LoginAction logact;
 	std::string name;
-	ChatsMsgs chats;
+	std::vector<Chat> chats;
+	std::string text;
+	FocAction ua;
+
 	~ActionsPayload(){}
 };
 
 struct Action {
 	Action(): type(NoneActionType) {}
+	Action(ActionTypes at): type(at) {}
 	ActionsPayload payload;
 	ActionTypes type;
 };

@@ -6,21 +6,29 @@
 
 #define BACKSPACE 127
 #define ENTER 10
-#define UP 65
-#define DOWN 66
 #define TAB 9
 #define ESC 27
+#define I_KEY 105
+#define K_KEY 107
+
+#define PORT 1337
 
 using namespace std;
 
+
 bool login();
 bool login_try(string& name, string& p455wd, Action& act);
+bool chat_window();
+void sendmsg(const string msg){}
+void refocus(
+	int& cur, int& prev, bool up, vector<Chat> v, const int max_focus
+	);
 
 bool login(){
 	Action act;
 
 	act.type = NoneActionType;
-	App(0, 0, WindowType::Auth, act);
+	App(WindowType::Auth, act);
 
 	while( 1 ){
 		string p455wd;
@@ -33,15 +41,15 @@ bool login(){
 			ActionsPayload ap;
 			ap.name = "Cirno";
 			act.payload = ap;
-			App(0, 0, Welcome, act);
+			App(Welcome, act);
 			getch();
 			return 0;
 		} else {
 			act.type = WrongCredsActionType;
-			App(0, 0, Auth, act);
+			App(Auth, act);
 			getch();
 			act.type = NoneActionType;
-			App(0, 0, WindowType::Auth, act);
+			App(WindowType::Auth, act);
 		}
 	}
 
@@ -84,10 +92,12 @@ bool login_try(string& name, string& p455wd, Action& act){
 		act.payload.logact.psswd = &p455wd;
 		act.payload.logact.cur = cur;
 
-		App(0, 0, Auth, act);
+		App(Auth, act);
 	}
 
 	echo();
+
+	return 0;
 }
 
 bool chat_window(){
@@ -116,23 +126,93 @@ bool chat_window(){
 		},
 		{"Ilya", "I think, these B&W terminal blocks isn't Qt", 1589301142},
 	};
-
 	vector<struct Chat> chats_v = {
-		{"Chat1", "Hey guys I want whole place search now", 4, msgs},
-		{"Chat2", "Come here and fight!", 1, msgs},
-		{"Chat3", "Where did you put Bertram's wooden snuff box?", 265, msgs}
+		{"Chat1", "I think, these B&W terminal blocks isn't Qt", 4, {msgs}},
+		{"Chat2", "Come here and fight!", 1, {}},
+		{"Chat3", "Where did you put Bertram's wooden snuff box?", 265, {}}
 	};
-
 	int cur_chat = 0;
-	Action act;
-	act.type = ChatMsgsActionType;
-	ActionsPayload ap;
-	ap.chats = ChatsMsgs(chats_v, cur_chat);
-	act.payload = ap;
+	string msg = "";
 
-	App(0, 0, Default, act);
-	getch();
+	Action init_act(DispChMsgActionType);
+	init_act.payload.chats = chats_v;
+
+	Action upd_act(UpdMsgActionType);
+
+	App(Default, init_act);
+
+	char ch;
+	bool status = 0;
+	int sel_chat = 0;
+	int prev_sel = 0;
+	int max_focus = chats_v.size() + 2;
+
+	// We're in library, so keep silence
+	noecho();
+	while( !status ){
+		switch( ch = getch() ){
+		case BACKSPACE:
+			if( !msg.size() ){
+				msg.pop_back();
+				upd_act.payload.text = msg;
+				App(Default, upd_act);
+			}
+			break;
+		case ENTER:
+			sendmsg(msg);
+			msg = "";
+			upd_act.payload.text = msg;
+			App(Input, upd_act);
+			status = 1;
+			continue;
+		case I_KEY:
+			refocus(sel_chat, prev_sel, 1, chats_v, max_focus);
+			break;
+		case K_KEY:
+			refocus(sel_chat, prev_sel, 0, chats_v, max_focus);
+			break;
+		case ESC:
+			return 1;
+		default:
+			upd_act.payload.text = msg;
+			App(Input, upd_act);
+		}
+	}
+
+	echo();
+
 	return 0;
+}
+
+void refocus(
+		int& cur, int& prev, bool up,
+		vector<Chat> v, const int max_focus
+		){
+		prev = cur;
+	if( up )
+		cur = (cur - 1 < 0 )? (max_focus - 1): cur-1;
+	else
+		cur = (cur + 1) % max_focus;
+
+	Action act(UnfocusActionType);
+	if( prev == max_focus - 1 ){
+		App(CreateArea, act);
+	}else if( prev == max_focus - 2 ){
+		App(JoinArea, act);
+	}else{
+		act.payload = ActionsPayload(FocAction(prev, v));
+		App(ChatListArea, act);
+	}
+
+	act.type = FocusActionType;
+	if( cur == max_focus - 1 ){
+		App(CreateArea, act);
+	}else if( cur == max_focus - 2 ){
+		App(JoinArea, act);
+	}else{
+		act.payload = ActionsPayload(FocAction(cur, v));
+		App(ChatListChatBlockArea, act);
+	}
 }
 
 
