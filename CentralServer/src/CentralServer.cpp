@@ -121,7 +121,8 @@ string CentralServer::Login(string username, string password) {
     while (it != users.end())
     {
         if (it->second.username == username) {
-            if (it->second.public_key == password || it->second.is_auth != true){
+            if (it->second.public_key == password && it->second.is_auth != true){
+                it->second.is_auth = true;
                 string id = b_uuid::to_string(it->first);
                 return id;
             } else {
