@@ -30,9 +30,9 @@ void Server::handleAccept(const error::error_code& ec, std::shared_ptr<tcp::sock
         asio::async_read(*socket, asio::buffer(*buf), std::bind(&Server::handleRead,
                                                                 this, std::placeholders::_1, std::placeholders::_2, buf));
         std::string msg(buf->data());
-        std::string chatName = msg.substr(msg.find(':') + 1, msg.find(' ') - msg.find(':'));
+        std::string chatName = msg.substr(msg.find(':') + 1, msg.find(' ') - msg.find(':') - 1);
         msg = msg.substr(msg.find(' ') + 1);
-        std::string senderId = msg.substr(msg.find(':') + 1, msg.find(' ') - msg.find(':'));
+        std::string senderId = msg.substr(msg.find(':') + 1, msg.find(' ') - msg.find(':') - 1);
         msg = msg.substr(msg.find(' ') + 1);
         std::string message = msg.substr(msg.find(':') + 1);
         Storage db;
