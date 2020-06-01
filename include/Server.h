@@ -34,5 +34,5 @@ private:
 
     void accept();
     void handleAccept(const error::error_code&, std::shared_ptr<tcp::socket>);
-    void handleRead(const error::error_code&, size_t, const std::string&);
+    void handleRead(const error::error_code&, size_t, std::shared_ptr<std::vector<char>> buf);
 };
