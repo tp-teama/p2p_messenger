@@ -10,14 +10,20 @@ using namespace std;
 void MessengerUI::Run(){
 	initscr();
 	curs_set(0);
+	keypad(stdscr, TRUE);
 
-	if( login() ){
+	// if( login() ){
+	// 	delwin(stdscr);
+	// 	endwin();
+	// 	return;
+	// }
+
+	if( chat_window() ){
 		delwin(stdscr);
 		endwin();
 		return;
 	}
 
-	
 	delwin(stdscr);
 	endwin();
 }

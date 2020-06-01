@@ -3,13 +3,14 @@
 
 #include "constants.cpp"
 #include "App.cpp"
+#include <algorithm>
 
-#define BACKSPACE 127
+#define BACKSPACE 7
 #define ENTER 10
 #define TAB 9
 #define ESC 27
-#define I_KEY 105
-#define K_KEY 107
+#define UP 3
+#define DOWN 2
 
 #define PORT 1337
 
@@ -19,10 +20,13 @@ using namespace std;
 bool login();
 bool login_try(string& name, string& p455wd, Action& act);
 bool chat_window();
-void sendmsg(const string msg){}
+void sendmsg(const Message msgObj, vector<Chat>& v, int cur);
 void refocus(
-	int& cur, int& prev, bool up, vector<Chat> v, const int max_focus
+	int& cur_sel, int& prev_sel, int& cur_chat, bool up,
+	vector<Chat> v, const int max_focus
 	);
+bool isempty(string s);
+
 
 bool login(){
 	Action act;
@@ -131,49 +135,60 @@ bool chat_window(){
 		{"Chat2", "Come here and fight!", 1, {}},
 		{"Chat3", "Where did you put Bertram's wooden snuff box?", 265, {}}
 	};
-	int cur_chat = 0;
-	string msg = "";
+	string username = "Ilya";
 
-	Action init_act(DispChMsgActionType);
-	init_act.payload.chats = chats_v;
+	Action msgs_act(DispChMsgActionType);
+	msgs_act.payload.chats = chats_v;
 
 	Action upd_act(UpdMsgActionType);
 
-	App(Default, init_act);
+	App(Default, msgs_act);
+
+	msgs_act.type = AddMsgActionType;
 
 	char ch;
 	bool status = 0;
-	int sel_chat = 0;
+	int cur_sel = 0;
 	int prev_sel = 0;
-	int max_focus = chats_v.size() + 2;
+	int cur_chat = 0;
+	Message msgObj;
+	string msg = "";
 
 	// We're in library, so keep silence
 	noecho();
 	while( !status ){
 		switch( ch = getch() ){
-		case BACKSPACE:
-			if( !msg.size() ){
-				msg.pop_back();
-				upd_act.payload.text = msg;
-				App(Default, upd_act);
-			}
-			break;
 		case ENTER:
-			sendmsg(msg);
+			App(Input, Action(ClearInputActionType));
+			if( !isempty(msg) ){
+				msgObj.set(username, msg, time(NULL));
+				sendmsg( msgObj, chats_v, cur_chat);
+				msgs_act.payload = ActionsPayload(
+					FocAction(cur_chat, chats_v)
+					);
+				App(ChatMainArea, msgs_act);
+			}
 			msg = "";
-			upd_act.payload.text = msg;
-			App(Input, Action(AddMsgActionType));
 			break;
-		case I_KEY:
-			refocus(sel_chat, prev_sel, 1, chats_v, max_focus);
+		case UP:
+			refocus(cur_sel, prev_sel, cur_chat, 1, chats_v, chats_v.size() + 2);
 			break;
-		case K_KEY:
-			refocus(sel_chat, prev_sel, 0, chats_v, max_focus);
+		case DOWN:
+			refocus(cur_sel, prev_sel, cur_chat, 0, chats_v, chats_v.size() + 2);
 			break;
 		case ESC:
-			return 1;
+			status = 1;
+			break;
+		case BACKSPACE:
+			if( msg.size() ){
+				msg.pop_back();
+				upd_act.payload.text = msg + " ";
+				App(Input, upd_act);
+			}
+			break;
 		default:
 			msg += ch;
+			// msg += to_string(sel_chat);
 			upd_act.payload = ActionsPayload(msg);
 			App(Input, upd_act);
 			break;
@@ -185,35 +200,52 @@ bool chat_window(){
 }
 
 void refocus(
-		int& cur, int& prev, bool up,
+		int& cur_sel, int& prev_sel, int& cur_chat, bool up,
 		vector<Chat> v, const int max_focus
 		){
-	prev = cur;
+	prev_sel = cur_sel;
 	if( up )
-		cur = (cur - 1 < 0 )? (max_focus - 1): cur-1;
+		cur_sel = (cur_sel - 1 < 0)? (max_focus - 1): (cur_sel - 1);
 	else
-		cur = (cur + 1) % max_focus;
+		cur_sel = (cur_sel + 1) % max_focus;
+
+	if( 0 <= cur_sel && cur_sel <= max_focus - 3 ){
+		cur_chat = cur_sel;
+	}
 
 	Action act(UnfocusActionType);
-	if( prev == max_focus - 1 ){
+	if( prev_sel == max_focus - 1 ){
 		App(CreateArea, act);
-	}else if( prev == max_focus - 2 ){
+	}else if( prev_sel == max_focus - 2 ){
 		App(JoinArea, act);
 	}else{
-		act.payload = ActionsPayload(FocAction(prev, v));
+		act.payload = ActionsPayload(FocAction(prev_sel, v));
 		App(ChatListArea, act);
 	}
 
 	act.type = FocusActionType;
-	if( cur == max_focus - 1 ){
+	if( cur_sel == max_focus - 1 ){
 		App(CreateArea, act);
-	}else if( cur == max_focus - 2 ){
+	}else if( cur_sel == max_focus - 2 ){
 		App(JoinArea, act);
 	}else{
-		act.payload = ActionsPayload(FocAction(cur, v));
+		act.payload = ActionsPayload(FocAction(cur_chat, v));
 		App(ChatListChatBlockArea, act);
 	}
 }
 
+void sendmsg(const Message msgObj, vector<Chat>& v, int cur){
+
+	v[cur].msgs.push_back(msgObj);
+
+}
+
+bool isempty(string s){
+	if( all_of(s.begin(), s.end(), [](char c){return isspace(c);}) )
+		return 1;
+	if( s.empty() )
+		return 1;
+	return 0;
+}
 
 #endif NCURSCRIPT

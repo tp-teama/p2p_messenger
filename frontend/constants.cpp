@@ -6,10 +6,10 @@
 #include <vector>
 
 struct Message {
-	Message& set(std::string name, std::string text, int timestamp){
-		name = name;
-		text = text;
-		timestamp = timestamp;
+	void set(std::string username, std::string txt, int ts){
+		name = username;
+		text = txt;
+		timestamp = ts;
 	}
 
 	std::string name;
@@ -74,6 +74,7 @@ union ActionsPayload {
 	}
 	ActionsPayload(const FocAction fa): ua(fa) {}
 	ActionsPayload(const std::string& s): text(s) {}
+	ActionsPayload(const std::vector<Chat>& v): chats(v) {}
 
 	LoginAction logact;
 	std::string name;

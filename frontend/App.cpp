@@ -44,7 +44,6 @@ void App(WindowType app_win, Action act){
 	height--;
 	width--;
 
-
 	switch( app_win ){
 		case Auth:
 			AppAuth(0, 0, height, width, app_win, act);
@@ -52,6 +51,7 @@ void App(WindowType app_win, Action act){
 		case Welcome:
 			Greeter(0, 0, height, width, app_win, act);
 			break;
+		case ChatMainArea:
 		case Input:
 			ChatWindow(0, width/4 + 2, height, width - width/4 - 2, app_win, act);
 			break;
@@ -220,6 +220,9 @@ void ChatWindow(
 		ChatHeader(y0, x0, 1, width, app_win, act);
 		ChatBlock(y0 + 2, x0, height - 4, width, app_win, act);
 		break;
+	case ChatMainArea:
+		ChatBlock(y0 + 2, x0, height - 4, width, app_win, act);
+		break;
 	default:
 		ChatHeader(y0, x0, 1, width, app_win, act);
 
@@ -270,7 +273,7 @@ void InputField(
 	case UpdMsgActionType:
 		mvwaddstr(stdscr, y0, x0, act.payload.text.c_str());
 		break;
-	case AddMsgActionType:
+	case ClearInputActionType:
 		mvwhline(stdscr, y0, x0, ' ', width);
 		break;
 	default:
@@ -282,7 +285,7 @@ void ChatBlock(
 		int y0, int x0, int height, int width, WindowType app_win, Action act
 		){
 	vector<Message> msgs;
-	if( act.type == FocusActionType ){
+	if( act.type == FocusActionType || act.type == AddMsgActionType ){
 		msgs = act.payload.ua.v[act.payload.ua.num].msgs;
 
 		WINDOW* my_win = newwin(height + 1, width + 1, y0, x0);
