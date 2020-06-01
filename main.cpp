@@ -11,7 +11,7 @@ int main() {
     char go = 'd';
     Storage s = Storage();
     s.Connect();
-//    s.InitDB();
+
     while(go != 'o') {
         std::cout << "Введи действие reg/auth" << std::endl;
         std::cin >> go;
@@ -30,7 +30,7 @@ int main() {
             nathan.hi();
             while(go != 'o')
             {
-                std::cout << "Введи действие create_chat/join_chat/send_mes_in_chat" << std::endl;
+                std::cout << "Введи действие create_chat/join_chat/send_mes_in_chat/see messages" << std::endl;
                 std::cin >> go;
                 if(go == 'c')
                 {
@@ -66,16 +66,31 @@ int main() {
                     std::cin >> mes >> chat;
                     nathan.sendMessage(make_shared<Message>(mes), chat);
                     std::vector<Message> chats = nathan.get_messages(chat);
-                    while(!chats.empty())
+                    for(auto mes : chats)
                     {
-                        std::cout << chats.back().mes << std::endl;
-                        chats.pop_back();
+                        std::cout << mes.mes << std::endl;
                     }
                 }
-
+                if(go =='m')
+                {
+                    std::cout << "Введи сообщения из какого чата хочешь посмотреть" << std::endl;
+                   std::vector<Chat> chats = nathan.get_chats();
+                    while(!chats.empty()) {
+                        std::cout << chats.back().name << std::endl;
+                        chats.pop_back();
+                    }
+                    std::string mes, chat;
+                    std::cin >> chat;
+                    std::vector<Message> messages = nathan.get_messages(chat);
+                    for(auto mes : messages)
+                    {
+                        std::cout << mes.mes << " - "<< mes.name_sender << std::endl;
+                    }
+                }
             }
         }
-    }
+
+            }
     while(1) {}
     return 0;
 }

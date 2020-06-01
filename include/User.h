@@ -12,6 +12,7 @@
 #include <boost/uuid/uuid_io.hpp>
 // streaming operators etc.
 #include <boost/lexical_cast.hpp>
+#include <algorithm>
 
 namespace b_uuid = boost::uuids;
 typedef boost::uuids::uuid o_uuid;
@@ -28,6 +29,8 @@ public:
     {
 
     }
+
+
     bool auth(const std::string&);
     bool registration( const std::string&, const std::string&);
     void hi();
@@ -45,5 +48,5 @@ private:
     std::string username;
     std::string publicKey;
     std::string ipAdress;
-    std::vector <std::shared_ptr<Chat>> chats;
+    std::vector <Chat> chats;
 };

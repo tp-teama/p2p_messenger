@@ -30,7 +30,7 @@ public:
     int AddChat(string chat_name, string chat_password);
     Chat GetChat(uint id);
     vector<Chat> GetUsersChats();
-    Chat GetChatByName(string chat_name);
+    Chat& GetChatByName(string chat_name);
     Message GetLastMsg(string chat_name);
     void CloseDB();
 private:

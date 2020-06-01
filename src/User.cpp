@@ -14,6 +14,12 @@ bool User::auth(const std::string& password)
         return false;
     }
     this->user_id = boost::lexical_cast<o_uuid>(id);
+    Storage db;
+    this->chats = std::move(db.GetUsersChats());
+    for(auto chat: chats)
+    {
+        chat.messages = std::move(db.GetChatByName(chat.name).messages);
+    }
     return true;
 }
 bool User::registration(const std::string& login,const std::string& password)
@@ -22,11 +28,9 @@ bool User::registration(const std::string& login,const std::string& password)
     {
         return false;
     }
-//    o_uuid id = boost::uuids::random_generator()();
     std::string str = to_string(port);
     std::string init_str = "command:add_user username:" + login +
                            " password:" + password + " ip:" + str;
-//    SendToPort(init_str, 5000);
     std::string id = Registration(init_str);
     if(id.empty())
     {
@@ -53,13 +57,13 @@ void User::goodbye()
 }
 std::vector<Chat> User::get_chats()
 {
-    Storage db;
-    std::vector<Chat> chats = db.GetUsersChats();
-    if(chats.empty())
-    {
-        chats.assign(1,0);
-    }
-    return chats;
+//    Storage db;
+//    std::vector<Chat> chats = db.GetUsersChats();
+//    if(chats.empty())
+//    {
+//        chats.assign(1,0);
+//    }
+    return this->chats;
 }
 std::vector <Message> User::get_messages(const std::string& chatName)
 {
@@ -73,6 +77,7 @@ std::vector <Message> User::get_messages(const std::string& chatName)
     Storage db;
     Chat chat = db.GetChatByName(chatName);
     std::vector<Message> messages = chat.messages;
+    return messages;
 }
 int User::connectChat(const std::string& chatName)
 {
@@ -83,19 +88,33 @@ int User::connectChat(const std::string& chatName)
 int User::createChat(const std::string& chatName, const std::string& pass) {
     std::string init_str = "command:create_chat user_id:" + to_string(this->user_id) +
                            " chat_name:" + chatName + " password:" + pass;
+    Chat chat;
+    chat.name = chatName;
+    chat.password = pass;
+    this->chats.push_back(chat);
     SendToPort(init_str,5000);//вопрос по БД
-    return 0;
+    return 1;
 }
 int User::connectNewChat(const std::string& chatName, const std::string& pass){
     std::string init_str = "command:join_chat user_id:" + to_string(this->user_id) +
                            " chat_name:" + chatName + " password:" + pass;
-    SendToPort(init_str,5000);// опрос по БД
+    Chat chat;
+    if(SendToPort(init_str,5000))
+    {
+        chat.name = chatName;
+        chat.password = pass;
+        this->chats.push_back(chat);
+        return 1;
+    }
     return 0;
 }
 bool User::sendMessage(std::shared_ptr<Message> message, const std::string& chatName)
 {
-    Storage db;
-    std::shared_ptr<Chat> chat = make_shared<Chat>(db.GetChatByName(chatName));
+    Chat test;
+    test.name = chatName;
+    message->name_sender = this->username;
+    message->chat_name = chatName;
+    std::shared_ptr<Chat> chat = make_shared<Chat>(*(std::find(this->chats.begin(), chats.end(), test)));
     return SendToChat(message, chat, this->user_id);
 }
 //int User::acceptMessage(std::shared_ptr<Message> message, std::shared_ptr<Storage>)
