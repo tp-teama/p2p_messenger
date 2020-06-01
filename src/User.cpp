@@ -114,8 +114,10 @@ bool User::sendMessage(std::shared_ptr<Message> message, const std::string& chat
     test.name = chatName;
     message->name_sender = this->username;
     message->chat_name = chatName;
-    std::shared_ptr<Chat> chat = make_shared<Chat>(*(std::find(this->chats.begin(), chats.end(), test)));
-    return SendToChat(message, chat, this->user_id);
+    auto kek = std::find(this->chats.begin(), chats.end(), test);
+    std::shared_ptr<Chat> chat = make_shared<Chat>(*kek);
+    bool res = SendToChat(message, chat, this->user_id);
+    return res;
 }
 //int User::acceptMessage(std::shared_ptr<Message> message, std::shared_ptr<Storage>)
 //{

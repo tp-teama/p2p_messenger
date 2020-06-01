@@ -11,7 +11,6 @@ int main() {
     char go = 'd';
     Storage s = Storage();
     s.Connect();
-
     while(go != 'o') {
         std::cout << "Введи действие reg/auth" << std::endl;
         std::cin >> go;
