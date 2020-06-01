@@ -51,7 +51,7 @@ bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> ch
     auto buf = std::make_shared<std::vector<char>>(1024);
     client.GetSocket().receive(asio::buffer(*buf));
     std::string response = buf->data();
-    int port = stoi(response.substr(response.find(':') + 1, response.length()));
+    int port = stoi(response.substr(response.find(':') + 1));
     if (!port) {
         return false;
     }
@@ -86,4 +86,3 @@ std::string Peer::Registration(const std::string& request) {
     client.Close();
     return response.substr(response.find(':') + 1, response.length());
 }
-// трехтысячный порт ввели

@@ -36,10 +36,13 @@ void Server::handleAccept(const error::error_code& ec, std::shared_ptr<tcp::sock
 
 void Server::handleRead(const error::error_code& ec, size_t bytes, const std::string& msg) {
     if (!ec) {
-        std::string chatId = msg.substr(msg.find("chat_id:") + 1, msg.find(' '));
-        std::string senderId = msg.substr(msg.find(chatId) + 2, msg.find(" message"));
-        std::string message = msg.substr(msg.find(senderId) + 2, msg.length());
+        std::string chatName = msg.substr(msg.find(':') + 1, msg.find(' ') - msg.find(':'));
+        int senderIdIndex = msg.substr(msg.find("sender_id:"),
+                                       msg.length() - msg.find("sender_id:")).find(':') + 1;
+        std::string senderId = msg.substr(senderIdIndex, msg.substr(senderIdIndex).length()
+                                                            - msg.substr(senderIdIndex).find(" message:") - 1);
+        std::string message = msg.substr(msg.substr(msg.find("message:")).find(':') + 1);
         Storage db;
-        db.AddMessage(senderId, chatId, message);
+        db.AddMessage(senderId, chatName, message);
     }
 }
