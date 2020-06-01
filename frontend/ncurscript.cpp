@@ -162,9 +162,8 @@ bool chat_window(){
 			sendmsg(msg);
 			msg = "";
 			upd_act.payload.text = msg;
-			App(Input, upd_act);
-			status = 1;
-			continue;
+			App(Input, Action(AddMsgActionType));
+			break;
 		case I_KEY:
 			refocus(sel_chat, prev_sel, 1, chats_v, max_focus);
 			break;
@@ -174,11 +173,12 @@ bool chat_window(){
 		case ESC:
 			return 1;
 		default:
-			upd_act.payload.text = msg;
+			msg += ch;
+			upd_act.payload = ActionsPayload(msg);
 			App(Input, upd_act);
+			break;
 		}
 	}
-
 	echo();
 
 	return 0;
@@ -188,7 +188,7 @@ void refocus(
 		int& cur, int& prev, bool up,
 		vector<Chat> v, const int max_focus
 		){
-		prev = cur;
+	prev = cur;
 	if( up )
 		cur = (cur - 1 < 0 )? (max_focus - 1): cur-1;
 	else

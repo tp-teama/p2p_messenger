@@ -6,6 +6,12 @@
 #include <vector>
 
 struct Message {
+	Message& set(std::string name, std::string text, int timestamp){
+		name = name;
+		text = text;
+		timestamp = timestamp;
+	}
+
 	std::string name;
 	std::string text;
 	int timestamp;
@@ -27,7 +33,8 @@ enum WindowType {
 	JoinArea,
 	CreateArea,
 	ChatListArea,
-	ChatListChatBlockArea
+	ChatListChatBlockArea,
+	ChatMainArea
 };
 
 enum ActionTypes {
@@ -38,7 +45,9 @@ enum ActionTypes {
 	DispChMsgActionType,
 	UpdMsgActionType,
 	FocusActionType,
-	UnfocusActionType
+	UnfocusActionType,
+	AddMsgActionType,
+	ClearInputActionType
 };
 
 struct LoginAction {
@@ -61,9 +70,10 @@ union ActionsPayload {
 	ActionsPayload(const ActionsPayload& act){memcpy(this, &act, sizeof(act));}
 	ActionsPayload& operator=( const ActionsPayload& act ){
 		memcpy(this, &act, sizeof(act));
-		return *this; 
+		return *this;
 	}
 	ActionsPayload(const FocAction fa): ua(fa) {}
+	ActionsPayload(const std::string& s): text(s) {}
 
 	LoginAction logact;
 	std::string name;

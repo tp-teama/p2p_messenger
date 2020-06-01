@@ -26,7 +26,7 @@
 
 #define HOR ACS_HLINE
 #define VER ACS_VLINE
-#define HOR_SEC '-'
+#define HOR_SEC ACS_HLINE
 #define VER_SEC '|'
 #define PSWD_SYM '*'
 
@@ -124,7 +124,7 @@ void ChatList(
 		}
 
 		if( chats.size() > 1 )
-			mvwhline(stdscr, 2, 0, HOR_SEC, width+1);
+			mvwhline(stdscr, 2, 1, HOR_SEC, width - 1);
 
 		int i;
 		for(
@@ -137,7 +137,7 @@ void ChatList(
 			mvwprintw(
 				stdscr, i*3+1, 0, trunc(chats[i].last_msg, width+1).c_str()
 				);
-			mvwhline(stdscr, i*3+2, 0, HOR_SEC, width+1);
+			mvwhline(stdscr, i*3+2, 1, HOR_SEC, width - 1);
 		}
 
 		if( chats.size() ){
@@ -209,14 +209,17 @@ void ChatWindow(
 	switch( app_win ){
 	case ChatLogin:
 		ChatAuth(y0, x0, height, width, app_win, act);
+		break;
 	case Input:
 		// Change it while text is more than 2 lines
 
 		// mvwhline(stdscr, height - 1, x0, HOR, width + 1);
 		InputField(height, x0, 1, width, app_win, act);
+		break;
 	case ChatListChatBlockArea:
 		ChatHeader(y0, x0, 1, width, app_win, act);
 		ChatBlock(y0 + 2, x0, height - 4, width, app_win, act);
+		break;
 	default:
 		ChatHeader(y0, x0, 1, width, app_win, act);
 
@@ -263,9 +266,14 @@ void ChatHeader(
 void InputField(
 		int y0, int x0, int height, int width, WindowType app_win, Action act
 		){
-	if( act.type == UpdMsgActionType ){
+	switch( act.type ){
+	case UpdMsgActionType:
 		mvwaddstr(stdscr, y0, x0, act.payload.text.c_str());
-	}else{
+		break;
+	case AddMsgActionType:
+		mvwhline(stdscr, y0, x0, ' ', width);
+		break;
+	default:
 		mvwaddstr(stdscr, y0, x0, "");
 	}
 }
@@ -299,7 +307,7 @@ void ChatBlock(
 				msg_header(msgs[m].name, msgs[m].timestamp).c_str()
 				);
 		if(y >= y0)
-			mvwhline(stdscr, y--, x0, HOR_SEC, width + 1);
+			mvwhline(stdscr, y--, x0 + 1, HOR_SEC, width - 1);
 	}
 	// the first one message, that should be bordered above
 	if( y >= y0 && msgs.size() > 0 ){

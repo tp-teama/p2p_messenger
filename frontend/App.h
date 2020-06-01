@@ -1,7 +1,7 @@
 #include <string>
 #include "constants.cpp"
 
-void App(bool start, bool end, WindowType app_win, Action act);
+void App(WindowType app_win, Action act);
 
 void Panel(int y0, int x0, int height, int width, WindowType app_win, Action act);
 void ChatWindow(int y0, int x0, int height, int width, WindowType app_win, Action act);
