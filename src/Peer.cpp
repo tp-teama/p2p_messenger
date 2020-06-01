@@ -57,6 +57,8 @@ bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> ch
     }
     std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + to_string(uuid)
                                  + " message:" + message->mes;
+    Storage db;
+    db.AddMessage(to_string(uuid), chat->name, message->mes);
     client.Close();
     SendToPort(requestMessage, port);
     return true;
