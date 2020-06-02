@@ -11,7 +11,7 @@ class Peer
         : public ISendable
                 , public IReceivable {
 public:
-    Peer(tcp::endpoint);
+    Peer(const tcp::endpoint&);
     virtual ~Peer();
     void Accept();
     bool SendToPort(const std::string&, int port) override;

@@ -5,7 +5,7 @@
 #include "Chat.h"
 #include "Storage.h"
 
-Peer::Peer(tcp::endpoint ep)
+Peer::Peer(const tcp::endpoint& ep)
         : server(ep) {
     Accept();
 }
@@ -50,7 +50,6 @@ void Peer::saveChat(const std::string &request) {
 bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> chat, const o_uuid& uuid) {
     std::string request = "command:get_chat_name chat_name:" + chat->name + " user_id:" + to_string(uuid);
     client.Connect(5000);
-
     client.GetSocket().send(asio::buffer(request));
     auto buf = std::make_shared<std::vector<char>>(1024);
     client.GetSocket().receive(asio::buffer(*buf));
@@ -59,10 +58,10 @@ bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> ch
     if (!port) {
         return false;
     }
-    std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + to_string(uuid)
+    std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + message->name_sender
                                  + " message:" + message->mes;
     Storage db;
-    db.AddMessage(to_string(uuid), chat->name, message->mes);
+    db.AddMessage(message->name_sender, chat->name, message->mes);
     client.Close();
     SendToPort(requestMessage, port);
     return true;

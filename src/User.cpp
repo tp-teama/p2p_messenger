@@ -92,7 +92,7 @@ int User::createChat(const std::string& chatName, const std::string& pass) {
     chat.name = chatName;
     chat.password = pass;
     this->chats.push_back(chat);
-    SendToPort(init_str,5000);//вопрос по БД
+    SendToPort(init_str,5000);
     return 1;
 }
 int User::connectNewChat(const std::string& chatName, const std::string& pass){

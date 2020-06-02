@@ -6,7 +6,11 @@
 
 int main() {
     std::cout << "Какой порт?" << std::endl;
-    int port;
+    asio::io_service pr;
+    tcp::socket sock(pr);
+    sock.open(tcp::v4());
+    int port = sock.local_endpoint().port();
+    sock.close();
     std::cin >> port;
     char go = 'd';
     Storage s = Storage();
@@ -29,7 +33,7 @@ int main() {
             nathan.hi();
             while(go != 'o')
             {
-                std::cout << "Введи действие create_chat/join_chat/send_mes_in_chat/see messages" << std::endl;
+                std::cout << "Введи действие create_chat/join_chat/send_mes_in_chat/see messages(m)/exit" << std::endl;
                 std::cin >> go;
                 if(go == 'c')
                 {
@@ -56,7 +60,6 @@ int main() {
                         std::cout << chats.back().name << std::endl;
                         chats.pop_back();
                     }
-
                 }
                 if(go == 's')
                 {
@@ -86,10 +89,15 @@ int main() {
                         std::cout << mes.mes << " - "<< mes.name_sender << std::endl;
                     }
                 }
+                if(go == 'e')
+                {
+                    nathan.goodbye();
+                    break;
+                }
             }
+            break;
         }
 
-            }
-    while(1) {}
+    }
     return 0;
 }
