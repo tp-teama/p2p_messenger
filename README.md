@@ -21,4 +21,5 @@
 ![cool retro](https://user-images.githubusercontent.com/31302079/81774769-e68cf400-94da-11ea-9f8d-a02b54d0bbdf.png)
 
 
-Пока, никаких действий не реализовано, вроде ввода текста и переключения между окнами
+![2xanimated](https://user-images.githubusercontent.com/31302079/83467653-19872f80-a46a-11ea-8ab7-ee4489f89453.gif)
+
