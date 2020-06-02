@@ -144,6 +144,7 @@ bool CentralServer::Logout(o_uuid user_id) {
     if (u->second.is_auth == false) {
         return false;
     } else {
+        u->second.ip_adress = "0";
         u->second.is_auth = false;
         return true;
     }
