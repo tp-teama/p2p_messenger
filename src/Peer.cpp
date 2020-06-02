@@ -5,8 +5,10 @@
 #include "Chat.h"
 #include "Storage.h"
 
-Peer::Peer(tcp::endpoint ep)
-        : server(ep) {}
+Peer::Peer(const tcp::endpoint& ep)
+        : server(ep) {
+    Accept();
+}
 
 Peer::~Peer() {}
 
@@ -15,7 +17,7 @@ void Peer::Accept() {
     threadServerRunning.detach();
 }
 
-void Peer::SendToPort(const std::string &request, int port) {
+bool Peer::SendToPort(const std::string &request, int port) {
     client.Connect(port);
     client.GetSocket().send(asio::buffer(request));
     if (request.find("command:join_chat") != std::string::npos) {
@@ -24,11 +26,18 @@ void Peer::SendToPort(const std::string &request, int port) {
         std::string response = buf->data();
         if (response == "res:true") {
             saveChat(request);
+            client.Close();
+            return true;
         }
+        client.Close();
+        return false;
     } else if (request.find("command:create_chat") != std::string::npos) {
         saveChat(request);
+        client.Close();
+        return true;
     }
     client.Close();
+    return false;
 }
 
 void Peer::saveChat(const std::string &request) {
@@ -45,12 +54,14 @@ bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> ch
     auto buf = std::make_shared<std::vector<char>>(1024);
     client.GetSocket().receive(asio::buffer(*buf));
     std::string response = buf->data();
-    int port = stoi(response.substr(response.find(':') + 1, response.length()));
+    int port = stoi(response.substr(response.find(':') + 1));
     if (!port) {
         return false;
     }
-    std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + to_string(uuid)
+    std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + message->name_sender
                                  + " message:" + message->mes;
+    Storage db;
+    db.AddMessage(message->name_sender, chat->name, message->mes);
     client.Close();
     SendToPort(requestMessage, port);
     return true;
@@ -80,4 +91,3 @@ std::string Peer::Registration(const std::string& request) {
     client.Close();
     return response.substr(response.find(':') + 1, response.length());
 }
-// трехтысячный порт ввели

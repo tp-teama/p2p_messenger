@@ -125,9 +125,9 @@ Chat Storage::GetChat(uint id) {
     return chat;
 }
 
-Chat Storage::GetChatByName(string chat_name) {
+Chat& Storage::GetChatByName(string chat_name) {
     string sql;
-    Chat chat;
+    Chat* chat = new Chat();
 
     try {
         pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
@@ -135,7 +135,7 @@ Chat Storage::GetChatByName(string chat_name) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
             cout << "Can't open database" << endl;
-            return Chat{};
+            return *chat;
         }
 
         sql = "SELECT * from chats where chat_name = '" + chat_name + "';";
@@ -143,15 +143,15 @@ Chat Storage::GetChatByName(string chat_name) {
         pqxx::result R( N.exec( sql ));
 
         for (pqxx::result::const_iterator c = R.begin(); c != R.end(); ++c) {
-            chat.chat_id = c[0].as<int>();
-            chat.password = c[1].as<string>();
-            chat.name = c[2].as<string>();
+            chat->chat_id = c[0].as<int>();
+            chat->password = c[1].as<string>();
+            chat->name = c[2].as<string>();
         }
         cout << "Select success" << endl;
         conn.disconnect();
     } catch (const std::exception &e) {
         cerr << e.what() << std::endl;
-        return Chat{};
+        return *chat;
     }
 
     vector<Message> msgs;
@@ -162,10 +162,10 @@ Chat Storage::GetChatByName(string chat_name) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
             cout << "Can't open database" << endl;
-            return Chat{};
+            return *chat;
         }
 
-        sql = "SELECT * from message where chat_name = '" + chat.name + "';";
+        sql = "SELECT * from message where chat_name = '" + chat->name + "';";
         pqxx::nontransaction N(conn);
         pqxx::result R( N.exec( sql ));
 
@@ -181,11 +181,11 @@ Chat Storage::GetChatByName(string chat_name) {
         conn.disconnect();
     } catch (const std::exception &e) {
         cerr << e.what() << std::endl;
-        return Chat{};
+        return (*chat);
     }
-    chat.messages = msgs;
+    chat->messages = msgs;
 
-    return chat;
+    return *chat;
 }
 
 vector<Chat> Storage::GetUsersChats() {

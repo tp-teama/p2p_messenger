@@ -18,4 +18,9 @@ struct Chat{
     {
 
     }
+    bool operator ==(const Chat& chat)
+    {
+        return this->name == chat.name;
+    }
+
 };
