@@ -5,13 +5,7 @@
 #include "Storage.h"
 
 int main() {
-    std::cout << "Какой порт?" << std::endl;
-    asio::io_service pr;
-    tcp::socket sock(pr);
-    sock.open(tcp::v4());
-    int port = sock.local_endpoint().port();
-    sock.close();
-    std::cin >> port;
+    int port = 0;
     char go = 'd';
     Storage s = Storage();
     s.Connect();

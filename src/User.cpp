@@ -44,6 +44,7 @@ bool User::registration(const std::string& login,const std::string& password)
 void User::hi(){
     o_uuid id = this->user_id;
     std::string s = to_string(id);
+    port = this->Peer::server.GetAcceptor().local_endpoint().port();
     std::string str = to_string(port);
     std::string init_str = "command:update_ip user_id:" + s + " ip:" + str;
     SendToPort(init_str, 5000);
