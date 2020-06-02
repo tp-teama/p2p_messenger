@@ -11,6 +11,5 @@ void CreateChat(int y0, int x0, int height, int width, WindowType app_win, Actio
 void ChatHeader(int y0, int x0, int height, int width, WindowType app_win, Action act);
 void ChatBlock(int y0, int x0, int height, int width, WindowType app_win, Action act);
 void InputField(int y0, int x0, int height, int width, WindowType app_win, Action act);
-void ChatAuth(int y0, int x0, int height, int width, WindowType app_win, Action act);
-void AppAuth(int y0, int x0, int height, int width, WindowType app_win, Action act);
-void Greeter(int y0, int x0, int height, int width, WindowType app_win, Action act);
+void LoginWindow(int y0, int x0, int height, int width, WindowType app_win, Action act);
+void Sign(int y0, int x0, int height, int width, WindowType app_win, Action act);
