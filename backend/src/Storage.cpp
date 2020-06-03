@@ -1,13 +1,13 @@
 #include <iostream>
 #include <pqxx/pqxx>
 #include <string>
-#include "Storage.h"
+#include "../include/Storage.h"
 
 using namespace std;
 
 int Storage::Connect() {
     try {
-        pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
+        pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
             database = &conn;
@@ -27,7 +27,7 @@ int Storage::InitDB() {
     string sql_message;
 
     try {
-        pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
+        pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
@@ -70,7 +70,7 @@ int Storage::AddChat(string chat_name, string chat_password) {
     string sql_chat;
 
     try {
-        pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
+        pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
@@ -99,7 +99,7 @@ Chat Storage::GetChat(uint id) {
     Chat chat;
 
     try {
-        pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
+        pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
@@ -130,7 +130,7 @@ Chat& Storage::GetChatByName(string chat_name) {
     Chat* chat = new Chat();
 
     try {
-        pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
+        pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
@@ -157,7 +157,7 @@ Chat& Storage::GetChatByName(string chat_name) {
     vector<Message> msgs;
 
     try {
-        pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
+        pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
@@ -193,7 +193,7 @@ vector<Chat> Storage::GetUsersChats() {
     string sql;
 
     try {
-        pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
+        pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
@@ -229,7 +229,7 @@ int Storage::AddMessage(string sender, string chat_name, string msg) {
     string sql_mes;
 
     try {
-        pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
+        pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
@@ -258,7 +258,7 @@ Message Storage::GetMsg(uint msg_id) {
     Message msg;
 
     try {
-        pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
+        pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
@@ -290,7 +290,7 @@ Message Storage::GetLastMsg(string chat_name) {
     Message msg;
 
     try {
-        pqxx::connection conn("dbname = tp_mess user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
+        pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
             cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {

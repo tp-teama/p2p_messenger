@@ -11,4 +11,10 @@ struct Message
     }
     Message()
     {}
+	void set(std::string username, std::string txt, int ts)
+	{
+		name_sender = username;
+		mes = txt;
+		timestamp = ts;
+	}
 };

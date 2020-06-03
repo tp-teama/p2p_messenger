@@ -1,9 +1,9 @@
-#include "Peer.h"
+#include "../include/Peer.h"
 #include <functional>
 #include <thread>
-#include "Message.h"
-#include "Chat.h"
-#include "Storage.h"
+#include "../include/Message.h"
+#include "../include/Chat.h"
+#include "../include/Storage.h"
 
 Peer::Peer(const tcp::endpoint& ep)
         : server(ep) {
@@ -56,7 +56,6 @@ bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> ch
     std::string response = buf->data();
     int port = stoi(response.substr(response.find(':') + 1));
     if (!port) {
-        client.Close();
         return false;
     }
     std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + message->name_sender
