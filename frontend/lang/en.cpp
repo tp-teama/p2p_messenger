@@ -21,6 +21,8 @@
 
 #define GREET_MSG ("Welcome back")
 
+#define SIGN_UP_MSG ("Welcome to the club")
+
 #define WRONG_CRED ("Wrong username or password")
 
 #define CHAT_ADDED ("Chat have been added")
@@ -28,5 +30,11 @@
 #define WRONG_CHAT ("Chat haven't been found")
 
 #define NO_CHAT_NAME ("Chat name is empty")
+
+#define EMPTY_CRED ("Name or password is empty")
+
+#define REG_USER ("Sign up")
+
+#define AUTH_USER ("Sign in")
 
 #endif

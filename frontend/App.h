@@ -13,3 +13,4 @@ void ChatBlock(int y0, int x0, int height, int width, WindowType app_win, Action
 void InputField(int y0, int x0, int height, int width, WindowType app_win, Action act);
 void LoginWindow(int y0, int x0, int height, int width, WindowType app_win, Action act);
 void Sign(int y0, int x0, int height, int width, WindowType app_win, Action act);
+void SelectWindow(int y0, int x0, int height, int width, WindowType app_win, Action act);

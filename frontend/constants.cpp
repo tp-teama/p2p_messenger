@@ -78,7 +78,8 @@ enum WindowType {
 	ChatListArea,
 	ChatListChatBlockArea,
 	ChatMainArea,
-	ChatSignArea
+	ChatSignArea,
+	Select
 };
 
 enum ActionTypes {
@@ -94,6 +95,7 @@ enum ActionTypes {
 	AppAuthRegActionType,
 	SignCharsActionType,
 	SignStringActionType,
+	SelectActionType
 };
 
 struct LoginAction {

@@ -66,6 +66,9 @@ void App(WindowType app_win, Action act){
 			Panel(0, 0, height, width/4, app_win, act);
 			ChatWindow(0, width/4 + 2, height, width - width/4 - 2, app_win, act);
 			break;
+		case Select:
+			SelectWindow(0, 0, height, width, app_win, act);
+			break;
 		default:
 			mvwvline(stdscr, 0, width/4 + 1, VER, height+1);
 
@@ -455,6 +458,41 @@ void Sign(
 	wrefresh(win);
 
 	delwin(win);
+}
+
+void SelectWindow(
+		int y0, int x0, int height, int width, WindowType app_win, Action act
+		){
+	wclear(stdscr);
+	if( act.payload.isCreate ){
+		attron(A_REVERSE);
+		mvwaddstr(
+			stdscr,
+			y0 + height/2 - 2, x0 + (width - strlen(REG_USER))/2,
+			REG_USER
+		);
+		attroff(A_REVERSE);
+
+		mvwaddstr(
+			stdscr,
+			y0 + height/2 + 2, x0 + (width - strlen(REG_USER))/2,
+			AUTH_USER
+		);
+	}else{
+		mvwaddstr(
+			stdscr,
+			y0 + height/2 - 2, x0 + (width - strlen(REG_USER))/2,
+			REG_USER
+			);
+
+		attron(A_REVERSE);
+		mvwaddstr(
+			stdscr,
+			y0 + height/2 + 2, x0 + (width - strlen(AUTH_USER))/2,
+			AUTH_USER
+			);
+		attroff(A_REVERSE);
+	}
 }
 
 #endif

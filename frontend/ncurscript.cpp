@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "constants.cpp"
 #include "App.cpp"
+#include "lang/en.cpp"
 
 // #include "Peer.h"
 // #include "User.h"
@@ -20,7 +21,7 @@
 using namespace std;
 
 
-bool login();
+bool login(bool isReg);
 bool login_try(string& name, string& p455wd, Action& act);
 bool chat_window();
 void refocus(
@@ -33,8 +34,9 @@ bool tryAuth(string name, string pass, bool isCreate);
 Chat makeChat(string name){
 	Chat Ch; Ch.name = name; /* Ch.members = 1; */ return Ch;
 }
+bool selectFunction();
 
-bool login(){
+bool login(bool isReg){
 	Action act(AppAuthRegActionType);
 	act.payload = ActionsPayload(LoginAction("", "", 1));
 
@@ -46,18 +48,25 @@ bool login(){
 
 		if( !login_try(name, p455wd, act) )
 			return 0;
-		if( p455wd == "c1rn015b4k4" && name == "Cirno" ){
-			act.payload = ActionsPayload(string(GREET_MSG) + ", " + name);
+		if( !isReg && name == "Cirno" && p455wd == "c1rn015b4k4" ||
+				isReg && !isempty(name) && !isempty(p455wd)
+				){
+			if( isReg )
+				act.payload = ActionsPayload(string(SIGN_UP_MSG) + ", " + name);
+			else
+				act.payload = ActionsPayload(string(GREET_MSG) + ", " + name);
 			App(SignArea, act);
 			return 1;
-		}else{
+		}else if( !isReg ){
 			act.payload.chars = WRONG_CRED;
-			act.type = SignCharsActionType;
-			App(SignArea, act);
-			act.payload = LoginAction("", "", act.payload.logact.isUpper);
-			act.type = AppAuthRegActionType;
-			App(AppAuth, act);
+		}else{
+			act.payload.chars = EMPTY_CRED;
 		}
+		act.type = SignCharsActionType;
+		App(SignArea, act);
+		act.payload = LoginAction("", "", act.payload.logact.isUpper);
+		act.type = AppAuthRegActionType;
+		App(AppAuth, act);
 	}
 	return 0;
 }
@@ -392,6 +401,32 @@ bool tryAuth(string name, string pass, bool isCreate){
 		return 1;
 
 	return 0;
+}
+
+bool selectFunction(){
+	char ch;
+
+	Action act(SelectActionType);
+
+	App(Select, act);
+	int sel = 0;
+	while( 1 ){
+		switch( ch = getch() ){
+		case ESC:
+			return 0;
+		case UP:
+		case DOWN:
+			sel = !sel;
+			act.payload.isCreate = sel;
+			App(Select, act);
+			break;
+		case ENTER:
+			if( sel )
+				login(1);
+			else
+				login(0);
+		}
+	}
 }
 
 #endif NCURSCRIPT
