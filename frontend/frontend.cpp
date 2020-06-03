@@ -16,20 +16,24 @@ void MessengerUI::Run(){
 	curs_set(0);
 	keypad(stdscr, TRUE);
 
-	// User usr(0);
+	User usr(0);
 
-	if( !selectFunction() ){
+	if( !selectFunction(usr) ){
+		usr.goodbye();
 		delwin(stdscr);
 		endwin();
 		return;
 	}
 
-	if( chat_window() ){
+	// Is not important, but usable for continuos extending
+	if( chat_window(usr) ){
+		usr.goodbye();
 		delwin(stdscr);
 		endwin();
 		return;
 	}
 
+	usr.goodbye();
 	delwin(stdscr);
 	endwin();
 }

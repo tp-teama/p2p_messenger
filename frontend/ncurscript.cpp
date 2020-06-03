@@ -10,6 +10,8 @@
 // #include "User.h"
 // #include "Storage.h"
 
+#include "User.h"
+
 #define BACKSPACE 7
 #define ENTER 10
 #define ESC 27
@@ -21,22 +23,22 @@
 using namespace std;
 
 
-bool login(bool isReg);
+bool login(User& usr, bool isReg);
 bool login_try(string& name, string& p455wd, Action& act);
-bool chat_window();
+bool chat_window(User& usr);
 void refocus(
 	int& cur_sel, int& prev_sel, int& cur_chat, bool up, string text,
 	vector<Chat> v, const int max_focus, Action login_act
 	);
 bool isempty(string s);
-void ChatLogFunc(bool isCreate, vector<Chat>& chats_v);
-bool tryAuth(string name, string pass, bool isCreate);
+void ChatLogFunc(User& usr, bool isCreate, vector<Chat>& chats_v);
+bool tryAuth(User& usr, string name, string pass, bool isCreate);
 Chat makeChat(string name){
 	Chat Ch; Ch.name = name; /* Ch.members = 1; */ return Ch;
 }
-bool selectFunction();
+bool selectFunction(User& usr);
 
-bool login(bool isReg){
+bool login(User& usr, bool isReg){
 	Action act(AppAuthRegActionType);
 	act.payload = ActionsPayload(LoginAction("", "", 1));
 
@@ -48,25 +50,37 @@ bool login(bool isReg){
 
 		if( !login_try(name, p455wd, act) )
 			return 0;
-		if( !isReg && name == "Cirno" && p455wd == "c1rn015b4k4" ||
-				isReg && !isempty(name) && !isempty(p455wd)
-				){
-			if( isReg )
+		// if( !isReg && name == "Cirno" && p455wd == "c1rn015b4k4" ||
+		// 		isReg && !isempty(name) && !isempty(p455wd)
+		// 		){
+		if( isReg ){
+			if( usr.registration(name, p455wd) ){
 				act.payload = ActionsPayload(string(SIGN_UP_MSG) + ", " + name);
-			else
-				act.payload = ActionsPayload(string(GREET_MSG) + ", " + name);
-			App(SignArea, act);
-			return 1;
-		}else if( !isReg ){
-			act.payload.chars = WRONG_CRED;
+				App(SignArea, act);
+				return 1;
+			}else{
+				act.payload.chars = EMPTY_CRED;
+				act.type = SignCharsActionType;
+				App(SignArea, act);
+				act.payload = LoginAction("", "", act.payload.logact.isUpper);
+				act.type = AppAuthRegActionType;
+				App(AppAuth, act);
+			}
 		}else{
-			act.payload.chars = EMPTY_CRED;
+			if( usr.auth(name, p455wd) ){
+				usr.hi();
+				act.payload = ActionsPayload(string(GREET_MSG) + ", " + name);
+				App(SignArea, act);
+				return 1;
+			}else{
+				act.payload.chars = WRONG_CRED;
+				act.type = SignCharsActionType;
+				App(SignArea, act);
+				act.payload = LoginAction("", "", act.payload.logact.isUpper);
+				act.type = AppAuthRegActionType;
+				App(AppAuth, act);
+			}
 		}
-		act.type = SignCharsActionType;
-		App(SignArea, act);
-		act.payload = LoginAction("", "", act.payload.logact.isUpper);
-		act.type = AppAuthRegActionType;
-		App(AppAuth, act);
 	}
 	return 0;
 }
@@ -113,42 +127,9 @@ bool login_try(string& name, string& p455wd, Action& act){
 }
 
 // bool chat_window(User& usr){
-bool chat_window(){
-	vector<struct Message> msgs = {
-		// {"Ilya", "I'm going to create interface", 1589284088},
-		// {"Misha", "Natan and me will set up networking", 1589296970},
-		// {
-		// 	"Michail",
-		// 	{
-		// 		"Have you ever though about something big? It gets heavier when "
-		// 		"I pull it up. Sometimes I train so hard I rip the skin!"
-		// 	},
-		// 	1589297462
-		// },
-		// {
-		// 	"Natan",
-		// 	{
-		// 		"I suddenly smeared the weekday map\n"
-		// 		"splashing paint from a glass;\n"
-		// 		"On a plate of aspic\n"
-		// 		"I revealed\n"
-		// 		"the ocean's slanted cheek.\n"
-		// 		"On the scales of a tin fish\n"
-		// 	},
-		// 	1589297762
-		// },
-		// {"Ilya", "I think, these B&W terminal blocks isn't Qt", 1589301142},
-	};
-	vector<struct Chat> chats_v = {
-		// {"Chat1", "I think, these B&W terminal blocks isn't Qt", 4, {msgs}},
-		// {"Chat2", "Come here and fight!", 1, {}},
-		// {"Chat3", "Where did you put Bertram's wooden snuff box?", 265, {}}
-	};
-	string username = "Ilya";
-
-	// User usr(0);
-
-
+bool chat_window(User& usr){
+	vector<struct Chat> chats_v = usr.get_chats();
+	string username = usr.getName();
 
 	Action msgs_act(DispChMsgActionType);
 	msgs_act.payload = ActionsPayload(chats_v);
@@ -185,8 +166,6 @@ bool chat_window(){
 			if( !isempty(msg) ){
 				msgObj.set(username, msg, time(NULL));
 				chats_v[cur_chat].messages.push_back(msgObj);
-				// chats_v[cur_chat].last_msg = msg;
-				// sendmsg(...)
 				msgs_act.payload = ActionsPayload(
 					FocAction(cur_chat, chats_v, "")
 					);
@@ -209,7 +188,7 @@ bool chat_window(){
 		case LEFT:
 		case RIGHT:
 			if( cur_sel != cur_chat )
-				ChatLogFunc(cur_sel == chats_v.size() + 1, chats_v);
+				ChatLogFunc(usr, cur_sel == chats_v.size() + 1, chats_v);
 			break;
 		case ESC:
 			status = 1;
@@ -279,26 +258,7 @@ bool isempty(string s){
 	return 0;
 }
 
-void ChatLogFunc(bool isCreate, vector<Chat>& chats_v){
-	Chat newchat = {
-		// "TEAMA Chat", "I hope, Ilya won't find us there", 4,
-		// {
-		// 	{
-		// 		"Misha", "I've created this chat to protect us from Ilya's jokes",
-		// 		1591060209
-		// 	},
-		// 	{
-		// 		"Misha", "So good not to hear his jokes every 5 sec", 1591060329
-		// 	},
-		// 	{
-		// 		"Natan", "Yeah, It's like heaven", 1591060389
-		// 	},
-		// 	{
-		// 		"Michail", "I hope, Ilya won't find us there", 1591060815
-		// 	}
-		// }
-	};
-
+void ChatLogFunc(User& usr, bool isCreate, vector<Chat>& chats_v){
 	char ch;
 
 	char* bad = WRONG_CHAT;
@@ -347,21 +307,20 @@ void ChatLogFunc(bool isCreate, vector<Chat>& chats_v){
 					if( pass.size() )
 						pass.pop_back();
 				}
-
 				login_act.payload = ActionsPayload(
 					LoginAction(name, pass, login_act.payload.logact.isUpper)
 					);
 				App(ChatLoginArea, login_act);
 				break;
 			case ENTER:
-				if( tryAuth(name, pass, isCreate) ){
+				if( tryAuth(usr, name, pass, isCreate) ){
 					sg.payload.chars = ok;
 					sg.type = SignCharsActionType;
 
 					App(ChatSignArea, sg);
 
 					if( !isCreate )
-						chats_v.push_back(newchat);
+						chats_v.push_back(makeChat(name));
 					else
 						chats_v.push_back(makeChat(name));
 
@@ -390,20 +349,20 @@ void ChatLogFunc(bool isCreate, vector<Chat>& chats_v){
 	}
 }
 
-bool tryAuth(string name, string pass, bool isCreate){
+bool tryAuth(User& usr, string name, string pass, bool isCreate){
 	if( isCreate ){
-		if( isempty(name) )
-			return 0;
-		else
+		if( usr.createChat(name, pass) )
 			return 1;
+		else
+			return 0;
 	}
-	if( name == "TEAMA Chat" && pass == "deadbeef" )
+	if( usr.connectNewChat(name, pass) )
 		return 1;
-
-	return 0;
+	else
+		return 0;
 }
 
-bool selectFunction(){
+bool selectFunction(User& usr){
 	char ch;
 
 	Action act(SelectActionType);
@@ -422,9 +381,9 @@ bool selectFunction(){
 			break;
 		case ENTER:
 			if( sel )
-				login(1);
+				login(usr, 1);
 			else
-				if( login(0) )
+				if( login(usr, 0) )
 					return 1;
 		}
 	}
