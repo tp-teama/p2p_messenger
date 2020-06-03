@@ -31,7 +31,7 @@ public:
     }
 
 
-    bool auth(const std::string&);
+    bool auth(const std::string&, const std::string&);
     bool registration( const std::string&, const std::string&);
     void hi();
     void goodbye();
@@ -42,6 +42,7 @@ public:
     int connectNewChat(const std::string&, const std::string&);
     bool sendMessage(std::shared_ptr<Message> , const std::string&);
 //    int acceptMessage(std::shared_ptr<Message>, std::shared_ptr<Storage>);
+    std::string getName(){ return username; }
 private:
     o_uuid user_id;
     int port;

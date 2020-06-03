@@ -5,10 +5,6 @@
 #include "App.h"
 #include "ncurscript.h"
 
-// #include "../backend/include/Peer.h"
-// #include "../backend/include/User.h"
-// #include "../backend/include/Storage.h"
-
 using namespace std;
 
 
@@ -17,20 +13,23 @@ void MessengerUI::Run(){
 	curs_set(0);
 	keypad(stdscr, TRUE);
 
-	// User usr(0);
+	User usr(0);
 
-	if( !selectFunction() ){
+	if( !selectFunction(usr) ){
+		usr.goodbye();
 		delwin(stdscr);
 		endwin();
 		return;
 	}
 
-	if( chat_window() ){
+	if( chat_window(usr) ){
+		usr.goodbye();
 		delwin(stdscr);
 		endwin();
 		return;
 	}
 
+	usr.goodbye();
 	delwin(stdscr);
 	endwin();
 }

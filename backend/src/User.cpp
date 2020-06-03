@@ -2,8 +2,13 @@
 #include "../include/Chat.h"
 
 
-bool User::auth(const std::string& password)
+bool User::auth(const std::string& name, const std::string& password)
 {
+    username = name;
+    if(name.empty())
+    {
+        return false;
+    }
     if(password.empty())
     {
         return false;
