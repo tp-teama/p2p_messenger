@@ -118,6 +118,11 @@ bool chat_window(User& usr){
 	int cur_sel = 0;
 	int prev_sel = 0;
 	int cur_chat = -1;
+	if(!usr.get_chats().empty())
+    {
+	    cur_chat = 0;
+    }
+
 	Message msgObj;
 	string msg = "";
 	bool isLeft = 1;
@@ -135,6 +140,10 @@ bool chat_window(User& usr){
 			App(Input, Action(ClearInputActionType));
 			if( !isempty(msg) ){
 				msgObj.set(username, msg, time(NULL));
+				Message message(msg);
+				message.timestamp = NULL;
+				shared_ptr<Message> sendingMes = make_shared<Message>(message);
+				usr.sendMessage(sendingMes, chats_v[cur_chat].name);
 				chats_v[cur_chat].messages.push_back(msgObj);
 				msgs_act.payload = ActionsPayload(
 					FocAction(cur_chat, chats_v, "")
@@ -144,14 +153,16 @@ bool chat_window(User& usr){
 			msg = "";
 			break;
 		case UP:
-			chats_v = usr.get_chats();
+//			chats_v = usr.get_chats();
+			chats_v [cur_chat].messages = std::move(usr.get_messages(chats_v[cur_chat].name));
 			refocus(
 				cur_sel, prev_sel, cur_chat, 1, msg,
 				chats_v, chats_v.size() + 2, login_act
 				);
 			break;
 		case DOWN:
-			chats_v = usr.get_chats();
+//			chats_v = usr.get_chats();
+            chats_v [cur_chat].messages = std::move(usr.get_messages(chats_v[cur_chat].name));
 			refocus(
 				cur_sel, prev_sel, cur_chat, 0, msg,
 				chats_v, chats_v.size() + 2, login_act

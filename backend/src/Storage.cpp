@@ -212,7 +212,7 @@ vector<Chat> Storage::GetUsersChats() {
             chat.name = c[2].as<string>();
             chats.push_back(chat);
         }
-        cout << "Select success" << endl;
+//        cout << "Select success" << endl;
         conn.disconnect();
     } catch (const std::exception &e) {
         cerr << e.what() << std::endl;
@@ -231,7 +231,7 @@ int Storage::AddMessage(string sender, string chat_name, string msg) {
     try {
         pqxx::connection conn("dbname = tp_mess_test user = postgres password = docker hostaddr = 127.0.0.1 port = 5432");
         if (conn.is_open()) {
-            cout << "Opened database successfully: " << conn.dbname() << endl;
+//            cout << "Opened database successfully: " << conn.dbname() << endl;
         } else {
             cout << "Can't open database" << endl;
             return 1;
@@ -243,7 +243,7 @@ int Storage::AddMessage(string sender, string chat_name, string msg) {
 
         W.exec(sql_mes );
         W.commit();
-        cout << "Inserted successfully" << endl;
+//        cout << "Inserted successfully" << endl;
         conn.disconnect();
     } catch (const std::exception &e) {
         cerr << e.what() << std::endl;

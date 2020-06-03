@@ -25,7 +25,7 @@ void Server::accept() {
 void Server::handleAccept(const error::error_code& ec, std::shared_ptr<tcp::socket> socket) {
     if (!ec) {
         vectorSocket.emplace_back(socket);
-        std::cout << socket->remote_endpoint() << std::endl;
+//        std::cout << socket->remote_endpoint() << std::endl;
         auto buf = std::make_shared<std::vector<char>>(1024);
         asio::async_read(*socket, asio::buffer(*buf), std::bind(&Server::handleRead,
                                                                 this, std::placeholders::_1, std::placeholders::_2, buf));
