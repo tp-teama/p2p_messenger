@@ -1,17 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
-project(MessengerUI)
+project(p2p_messenger)
 
-find_package(Threads REQUIRED)
+set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++17 -Wall -Wextra -Werror=pedantic")
-add_executable(main frontend/main.cpp)
+add_executable(
+	p2p_messenger
+	main.cpp
+	)
 
-include_directories(frontend)
+add_library(MessengerBackend ../backend/CMakeLists.txt)
 
-find_package(Curses REQUIRED)
-include_directories(${CURSES_INCLUDE_DIR})
-
-target_link_libraries(main ${CURSES_LIBRARIES})
-
-SET(CURSES_USE_NCURSES TRUE)
+target_link_libraries(p2p_messenger MessengerBackend)

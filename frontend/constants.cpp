@@ -5,8 +5,8 @@
 #include <cstring>
 #include <vector>
 
-// #include "Chat.h"
-// #include "Message.h"
+// #include "../backend/include/Chat.h"
+// #include "../backend/include/Message.h"
 
 // struct Message {
 // 	void set(std::string username, std::string txt, int ts){
@@ -63,7 +63,6 @@ struct Chat{
     {
         return this->name == chat.name;
     }
-
 };
 
 enum WindowType {

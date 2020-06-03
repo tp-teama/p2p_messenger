@@ -4,9 +4,9 @@
 #include "App.cpp"
 #include "ncurscript.cpp"
 
-// #include "Peer.h"
-// #include "User.h"
-// #include "Storage.h"
+// #include "../backend/include/Peer.h"
+// #include "../backend/include/User.h"
+// #include "../backend/include/Storage.h"
 
 using namespace std;
 
