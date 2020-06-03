@@ -424,9 +424,11 @@ bool selectFunction(){
 			if( sel )
 				login(1);
 			else
-				login(0);
+				if( login(0) )
+					return 1;
 		}
 	}
 }
+
 
 #endif NCURSCRIPT
