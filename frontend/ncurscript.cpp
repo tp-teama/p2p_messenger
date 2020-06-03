@@ -35,75 +35,71 @@ Chat makeChat(string name){
 }
 
 bool login(){
-	Action act;
+	Action act(AppAuthRegActionType);
+	act.payload = ActionsPayload(LoginAction("", "", 1));
 
 	App(AppAuth, act);
 
 	while( 1 ){
 		string p455wd;
 		string name;
+		App(AppAuth, act);
 
-		if( login_try(name, p455wd, act) )
+		if( !login_try(name, p455wd, act) )
 			return 0;
 		if( p455wd == "c1rn015b4k4" && name == "Cirno" ){
-			act.payload.text = GREET_MSG("") + name ;
+			act.payload = ActionsPayload(string(GREET_MSG) + " " + name);
 			App(SignArea, act);
-			getch();
-			return 0;
+			return 1;
 		}else{
-			act.payload.text = WRONG_CRED;
+			act.payload.chars = WRONG_CRED;
+			act.type = SignCharsActionType;
 			App(SignArea, act);
-			getch();
-			App(AppAuth, act);
 		}
+		act.type = AppAuthRegActionType;
 	}
-
 	return 0;
 }
 
 bool login_try(string& name, string& p455wd, Action& act){
 	noecho();
 
-	act.type = LoginActionType;
-
 	char ch;
-	bool status = 0;
 
+	int isUpper = 1; // 0 for name, 1 for passwd
 
-	int cur = 0; // 0 for name, 1 for passwd
-
-	while( !status ){
+	while( 1 ){
 		switch( ch = getch() ){
 		case BACKSPACE:
-			if( !name.empty() && !cur )
+			if( !name.empty() && isUpper )
 				name.pop_back();
-			else if( !p455wd.empty() && cur )
-			    p455wd.pop_back();
+			else if( !p455wd.empty() && !isUpper )
+		    p455wd.pop_back();
 			break;
 		case ENTER:
-			status = 1;
-			continue;
+			return 1;
 		case DOWN:
 		case UP:
-			cur = !cur;
+			isUpper = !isUpper;
 			break;
 		case ESC:
-			return 1;
+			return 0;
+		case LEFT:
+		case RIGHT:
+			break;
 		default:
-			if( !cur ) name += ch;
+			if( isUpper ) name += ch;
 			else p455wd += ch;
 		}
 
-		act.payload.logact.name = name;
-		act.payload.logact.pass = p455wd;
-		act.payload.logact.isUpper = cur;
+		act.payload = ActionsPayload(LoginAction(name, p455wd, isUpper));
 
 		App(AppAuth, act);
 	}
 
 	echo();
 
-	return 0;
+	return 1;
 }
 
 // bool chat_window(User& usr){
@@ -241,7 +237,7 @@ void refocus(
 	else
 		cur_sel = (cur_sel + 1) % max_focus;
 
-	if( 0 <= cur_sel && cur_sel <= max_focus - 3 && cur_chat != -1 )
+	if( 0 <= cur_sel && cur_sel <= max_focus - 3 && v.size() )
 		cur_chat = cur_sel;
 
 	Action act(UnfocusActionType);
@@ -348,7 +344,7 @@ void ChatLogFunc(bool isCreate, vector<Chat>& chats_v){
 				App(ChatLoginArea, login_act);
 				break;
 			case ENTER:
-			if( tryAuth(name, pass, isCreate) ){
+				if( tryAuth(name, pass, isCreate) ){
 					sg.payload.chars = ok;
 					sg.type = SignCharsActionType;
 
