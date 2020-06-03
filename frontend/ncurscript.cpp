@@ -144,12 +144,14 @@ bool chat_window(User& usr){
 			msg = "";
 			break;
 		case UP:
+			chats_v = usr.get_chats();
 			refocus(
 				cur_sel, prev_sel, cur_chat, 1, msg,
 				chats_v, chats_v.size() + 2, login_act
 				);
 			break;
 		case DOWN:
+			chats_v = usr.get_chats();
 			refocus(
 				cur_sel, prev_sel, cur_chat, 0, msg,
 				chats_v, chats_v.size() + 2, login_act

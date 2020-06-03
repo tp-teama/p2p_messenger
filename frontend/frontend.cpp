@@ -16,7 +16,6 @@ void MessengerUI::Run(){
 	User usr(0);
 
 	if( !selectFunction(usr) ){
-		usr.goodbye();
 		delwin(stdscr);
 		endwin();
 		return;
