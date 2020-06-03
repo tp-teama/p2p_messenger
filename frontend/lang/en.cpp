@@ -19,7 +19,7 @@
 
 #define ENTER_CHAT_PASS ("Enter chat password")
 
-#define GREET_MSG(name) ("Welcome back, " name)
+#define GREET_MSG ("Welcome back")
 
 #define WRONG_CRED ("Wrong username or password")
 

@@ -18,11 +18,11 @@ void MessengerUI::Run(){
 
 	// User usr(0);
 
-	// if( login() ){
-	// 	delwin(stdscr);
-	// 	endwin();
-	// 	return;
-	// }
+	if( !login() ){
+		delwin(stdscr);
+		endwin();
+		return;
+	}
 
 	if( chat_window() ){
 		delwin(stdscr);
