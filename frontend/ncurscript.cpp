@@ -43,20 +43,21 @@ bool login(){
 	while( 1 ){
 		string p455wd;
 		string name;
-		App(AppAuth, act);
 
 		if( !login_try(name, p455wd, act) )
 			return 0;
 		if( p455wd == "c1rn015b4k4" && name == "Cirno" ){
-			act.payload = ActionsPayload(string(GREET_MSG) + " " + name);
+			act.payload = ActionsPayload(string(GREET_MSG) + ", " + name);
 			App(SignArea, act);
 			return 1;
 		}else{
 			act.payload.chars = WRONG_CRED;
 			act.type = SignCharsActionType;
 			App(SignArea, act);
+			act.payload = LoginAction("", "", act.payload.logact.isUpper);
+			act.type = AppAuthRegActionType;
+			App(AppAuth, act);
 		}
-		act.type = AppAuthRegActionType;
 	}
 	return 0;
 }
@@ -66,7 +67,7 @@ bool login_try(string& name, string& p455wd, Action& act){
 
 	char ch;
 
-	int isUpper = 1; // 0 for name, 1 for passwd
+	int isUpper = act.payload.logact.isUpper; // 0 for name, 1 for passwd
 
 	while( 1 ){
 		switch( ch = getch() ){
