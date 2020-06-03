@@ -1,0 +1,22 @@
+language: cpp
+compiler:
+  - clang
+
+os:
+  - linux
+
+env:
+  - GO111MODULE=on
+sudo: required
+
+#services:
+#  - docker
+#  -
+#before_script:
+#  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+script:
+
+  - mkdir build
+  - cd build
+  - cmake .. -DCI_BUILD=ON
+  - make
