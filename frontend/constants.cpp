@@ -5,23 +5,65 @@
 #include <cstring>
 #include <vector>
 
-struct Message {
+// #include "Chat.h"
+// #include "Message.h"
+
+// struct Message {
+// 	void set(std::string username, std::string txt, int ts){
+// 		name = username;
+// 		text = txt;
+// 		timestamp = ts;
+// 	}
+
+// 	std::string name;
+// 	std::string text;
+// 	int timestamp;
+// };
+struct Message
+{
 	void set(std::string username, std::string txt, int ts){
-		name = username;
-		text = txt;
+		name_sender = username;
+		mes = txt;
 		timestamp = ts;
 	}
+    std::string chat_name;
+    std::string mes;
+    std::string name_sender;
+    int timestamp;
+    Message(std::string str): mes(str)
+    {
 
-	std::string name;
-	std::string text;
-	int timestamp;
+    }
+    Message()
+    {}
 };
 
-struct Chat {
-	std::string name;
-	std::string last_msg;
-	int members;
-	std::vector<Message> msgs;
+// struct Chat {
+// 	std::string name;
+// 	std::string last_msg;
+// 	int members;
+// 	std::vector<Message> msgs;
+// };
+
+struct Chat{
+    std::vector<Message> messages;
+    std::string name;
+    std::string password;
+    int port;
+    uint chat_id;
+    Chat(int Port):port(Port)
+    {
+
+    }
+    Chat()
+    {
+
+    }
+    bool operator ==(const Chat& chat)
+    {
+        return this->name == chat.name;
+    }
+
 };
 
 enum WindowType {

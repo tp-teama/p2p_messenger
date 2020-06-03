@@ -41,6 +41,7 @@ void App(WindowType app_win, Action act){
 	height--;
 	width--;
 
+
 	switch( app_win ){
 		case AppAuth:
 			LoginWindow(0, 0, height, width, app_win, act);
@@ -114,42 +115,42 @@ void ChatList(
 	switch( act.type ){
 	case DispChMsgActionType:
 		chats = act.payload.chats;
+		if( chats.size() )
 		if( chats.size() ){
 			attron(A_REVERSE);
 			mvwprintw(
 				stdscr, 0, 1, trunc(chats[0].name, width).c_str()
 				);
 			mvwhline(stdscr, 1, 0, ' ', width);
-			mvwprintw(
-				stdscr, 1, 0, trunc(chats[0].last_msg,
-				width+1).c_str()
-				);
+			// mvwprintw(
+				// stdscr, 1, 0, trunc(chats[0].last_msg,
+				// width+1).c_str()
+				// );
 			attroff(A_REVERSE);
 		}
 
-		if( chats.size() > 1 )
+		if( chats.size() > 1 ){
 			mvwhline(stdscr, 2, 1, HOR_SEC, width - 1);
 
-		int i;
-		for(
-				i = 1;
-				i < (int)chats.size() - 1 && (i+1)*3 < height;
-				++i
-				){
+			int i;
+			for(
+					i = 1;
+					i < (int)chats.size() - 1 && (i+1)*3 < height;
+					++i
+					){
+				mvwprintw(stdscr, i*3, 1, trunc(chats[i].name, width).c_str());
+
+				// mvwprintw(
+				// 	stdscr, i*3+1, 0, trunc(chats[i].last_msg, width+1).c_str()
+				// 	);
+				mvwhline(stdscr, i*3+2, 1, HOR_SEC, width - 1);
+			}
+
 			mvwprintw(stdscr, i*3, 1, trunc(chats[i].name, width).c_str());
 
-			mvwprintw(
-				stdscr, i*3+1, 0, trunc(chats[i].last_msg, width+1).c_str()
-				);
-			mvwhline(stdscr, i*3+2, 1, HOR_SEC, width - 1);
-		}
-
-		if( chats.size() ){
-			mvwprintw(stdscr, i*3, 1, trunc(chats[i].name, width).c_str());
-
-			mvwprintw(
-				stdscr, i*3+1, 0, trunc(chats[i].last_msg, width+1).c_str()
-				);
+			// mvwprintw(
+			// 	stdscr, i*3+1, 0, trunc(chats[i].last_msg, width+1).c_str()
+			// 	);
 		}
 		break;
 	case UnfocusActionType:
@@ -159,9 +160,9 @@ void ChatList(
 		mvwprintw(stdscr, prev*3, 1, trunc(chats[prev].name, width).c_str());
 
 		mvwhline(stdscr, prev*3+1, 0, ' ', width );
-		mvwprintw(
-			stdscr, prev*3+1, 0, trunc(chats[prev].last_msg, width+1).c_str()
-			);
+		// mvwprintw(
+		// 	stdscr, prev*3+1, 0, trunc(chats[prev].last_msg, width+1).c_str()
+		// 	);
 		break;
 	case FocusActionType:
 		cur = act.payload.ua.num;
@@ -170,9 +171,9 @@ void ChatList(
 		attron(A_REVERSE);
 		mvwprintw(stdscr, cur*3, 1, trunc(chats[cur].name, width).c_str());
 
-		mvwprintw(
-			stdscr, cur*3+1, 0, trunc(chats[cur].last_msg, width+1).c_str()
-			);
+		// mvwprintw(
+		// 	stdscr, cur*3+1, 0, trunc(chats[cur].last_msg, width+1).c_str()
+		// 	);
 		attroff(A_REVERSE);
 		break;
 	}
@@ -254,7 +255,7 @@ void ChatHeader(
 		int y0, int x0, int height, int width, WindowType app_win, Action act
 		){
 	string chat_name;
-	int n_mem;
+	int n_mem = 0;
 	if( act.type == FocusActionType ){
 		WINDOW* win = newwin(1, width, y0, x0);
 		wclear(win);
@@ -263,19 +264,22 @@ void ChatHeader(
 
 		if( act.payload.ua.v.size() ){
 			chat_name = act.payload.ua.v[act.payload.ua.num].name;
-			n_mem = act.payload.ua.v[act.payload.ua.num].members;
+			// n_mem = act.payload.ua.v[act.payload.ua.num].members;
 		}
 	}else{
 		if( act.payload.chats.size() ){
 			chat_name = act.payload.chats[0].name;
-			n_mem = act.payload.chats[0].members;
+			// n_mem = act.payload.chats[0].members;
 		}
 	}
 	string members_str = MEMBERS;
 
-	string header = chat_name + "   " + to_string(n_mem) + " " + members_str;
+	if( act.payload.chats.size() ){
+		// string header = chat_name + "   " + to_string(n_mem) + " " + members_str;
+		string header = chat_name;
 
-	mvwaddstr(stdscr, y0, x0 + 1, header.c_str());
+		mvwaddstr(stdscr, y0, x0 + 1, header.c_str());
+	}
 }
 
 void InputField(
@@ -301,7 +305,7 @@ void ChatBlock(
 		){
 	vector<Message> msgs;
 	if( act.type == FocusActionType || act.type == AddMsgActionType ){
-		msgs = act.payload.ua.v[act.payload.ua.num].msgs;
+		msgs = act.payload.ua.v[act.payload.ua.num].messages;
 
 		WINDOW* win = newwin(height + 1, width + 1, y0, x0);
 		wclear(win);
@@ -309,33 +313,33 @@ void ChatBlock(
 		delwin(win);
 	}else{
 		if( act.payload.chats.size() )
-			msgs = act.payload.chats[0].msgs;
+			msgs = act.payload.chats[0].messages;
 	}
 
 	string header;
 	vector<string> lines;
 	int y = y0 + height;
 	for( int m = msgs.size() - 1; y >= y0 && m >= 1; --m ){
-		lines = wrap_text(msgs[m].text, width);
+		lines = wrap_text(msgs[m].mes, width);
 		for( int l = lines.size() - 1; y >= y0 && l >= 0; --l )
 			mvwaddstr(stdscr, y--, x0, lines[l].c_str());
 		if(y >= y0)
 			mvwaddstr(
 				stdscr, y--, x0 + 2,
-				msg_header(msgs[m].name, msgs[m].timestamp).c_str()
+				msg_header(msgs[m].name_sender, msgs[m].timestamp).c_str()
 				);
 		if(y >= y0)
 			mvwhline(stdscr, y--, x0 + 1, HOR_SEC, width - 1);
 	}
 	// the first one message, that should be bordered above
 	if( y >= y0 && msgs.size() > 0 ){
-		lines = wrap_text(msgs[0].text, width);
+		lines = wrap_text(msgs[0].mes, width);
 		for( int l = lines.size() - 1; y >= y0 && l >= 0; --l )
 			mvwaddstr(stdscr, y--, x0, lines[l].c_str());
 		if(y >= y0)
 			mvwaddstr(
 				stdscr, y--, x0 + 2,
-				msg_header(msgs[0].name, msgs[0].timestamp).c_str()
+				msg_header(msgs[0].name_sender, msgs[0].timestamp).c_str()
 				);
 	}
 }

@@ -1,20 +1,23 @@
 #ifndef NCURSCRIPT
 #define NCURSCRIPT
 
+#include <algorithm>
 #include "constants.cpp"
 #include "App.cpp"
-#include <algorithm>
+
+// #include "Peer.h"
+// #include "User.h"
+// #include "Storage.h"
 
 #define BACKSPACE 7
 #define ENTER 10
-#define TAB 9
+#define DOWN 9
+#define UP 9
 #define ESC 27
 #define UP 3
 #define DOWN 2
 #define LEFT 4
 #define RIGHT 5
-
-#define PORT 1337
 
 using namespace std;
 
@@ -30,7 +33,7 @@ bool isempty(string s);
 void ChatLogFunc(bool isCreate, vector<Chat>& chats_v);
 bool tryAuth(string name, string pass, bool isCreate);
 Chat makeChat(string name){
-	Chat Ch; Ch.name = name; Ch.members = 1; return Ch;
+	Chat Ch; Ch.name = name; /* Ch.members = 1; */ return Ch;
 }
 
 bool login(){
@@ -82,7 +85,8 @@ bool login_try(string& name, string& p455wd, Action& act){
 		case ENTER:
 			status = 1;
 			continue;
-		case TAB:
+		case DOWN:
+		case UP:
 			cur = !cur;
 			break;
 		case ESC:
@@ -104,41 +108,46 @@ bool login_try(string& name, string& p455wd, Action& act){
 	return 0;
 }
 
+// bool chat_window(User& usr){
 bool chat_window(){
 	vector<struct Message> msgs = {
-		{"Ilya", "I'm going to create interface", 1589284088},
-		{"Misha", "Natan and me will set up networking", 1589296970},
-		{
-			"Michail",
-			{
-				"Have you ever though about something big? It gets heavier when "
-				"I pull it up. Sometimes I train so hard I rip the skin!"
-			},
-			1589297462
-		},
-		{
-			"Natan",
-			{
-				"I suddenly smeared the weekday map\n"
-				"splashing paint from a glass;\n"
-				"On a plate of aspic\n"
-				"I revealed\n"
-				"the ocean's slanted cheek.\n"
-				"On the scales of a tin fish\n"
-			},
-			1589297762
-		},
-		{"Ilya", "I think, these B&W terminal blocks isn't Qt", 1589301142},
+		// {"Ilya", "I'm going to create interface", 1589284088},
+		// {"Misha", "Natan and me will set up networking", 1589296970},
+		// {
+		// 	"Michail",
+		// 	{
+		// 		"Have you ever though about something big? It gets heavier when "
+		// 		"I pull it up. Sometimes I train so hard I rip the skin!"
+		// 	},
+		// 	1589297462
+		// },
+		// {
+		// 	"Natan",
+		// 	{
+		// 		"I suddenly smeared the weekday map\n"
+		// 		"splashing paint from a glass;\n"
+		// 		"On a plate of aspic\n"
+		// 		"I revealed\n"
+		// 		"the ocean's slanted cheek.\n"
+		// 		"On the scales of a tin fish\n"
+		// 	},
+		// 	1589297762
+		// },
+		// {"Ilya", "I think, these B&W terminal blocks isn't Qt", 1589301142},
 	};
 	vector<struct Chat> chats_v = {
-		{"Chat1", "I think, these B&W terminal blocks isn't Qt", 4, {msgs}},
-		{"Chat2", "Come here and fight!", 1, {}},
-		{"Chat3", "Where did you put Bertram's wooden snuff box?", 265, {}}
+		// {"Chat1", "I think, these B&W terminal blocks isn't Qt", 4, {msgs}},
+		// {"Chat2", "Come here and fight!", 1, {}},
+		// {"Chat3", "Where did you put Bertram's wooden snuff box?", 265, {}}
 	};
 	string username = "Ilya";
 
+	// User usr(0);
+
+
+
 	Action msgs_act(DispChMsgActionType);
-	msgs_act.payload.chats = chats_v;
+	msgs_act.payload = ActionsPayload(chats_v);
 
 	Action upd_act(UpdMsgActionType);
 
@@ -160,6 +169,7 @@ bool chat_window(){
 	string name;
 	string pass;
 
+
 	// We're in library, so keep silence
 	noecho();
 	while( !status ){
@@ -170,8 +180,8 @@ bool chat_window(){
 			App(Input, Action(ClearInputActionType));
 			if( !isempty(msg) ){
 				msgObj.set(username, msg, time(NULL));
-				chats_v[cur_chat].msgs.push_back(msgObj);
-				chats_v[cur_chat].last_msg = msg;
+				chats_v[cur_chat].messages.push_back(msgObj);
+				// chats_v[cur_chat].last_msg = msg;
 				// sendmsg(...)
 				msgs_act.payload = ActionsPayload(
 					FocAction(cur_chat, chats_v, "")
@@ -267,22 +277,22 @@ bool isempty(string s){
 
 void ChatLogFunc(bool isCreate, vector<Chat>& chats_v){
 	Chat newchat = {
-		"TEAMA Chat", "I hope, Ilya won't find us there", 4,
-		{
-			{
-				"Misha", "I've created this chat to protect us from Ilya's jokes",
-				1591060209
-			},
-			{
-				"Misha", "So good not to hear his jokes every 5 sec", 1591060329
-			},
-			{
-				"Natan", "Yeah, It's like heaven", 1591060389
-			},
-			{
-				"Michail", "I hope, Ilya won't find us there", 1591060815
-			}
-		}
+		// "TEAMA Chat", "I hope, Ilya won't find us there", 4,
+		// {
+		// 	{
+		// 		"Misha", "I've created this chat to protect us from Ilya's jokes",
+		// 		1591060209
+		// 	},
+		// 	{
+		// 		"Misha", "So good not to hear his jokes every 5 sec", 1591060329
+		// 	},
+		// 	{
+		// 		"Natan", "Yeah, It's like heaven", 1591060389
+		// 	},
+		// 	{
+		// 		"Michail", "I hope, Ilya won't find us there", 1591060815
+		// 	}
+		// }
 	};
 
 	char ch;
@@ -352,8 +362,6 @@ void ChatLogFunc(bool isCreate, vector<Chat>& chats_v){
 						chats_v.push_back(makeChat(name));
 
 					chats_act.payload = ActionsPayload(chats_v);
-					fprintf(stderr, "%s\n", "test");
-
 					App(ChatListArea, chats_act);
 					return;
 				}else{
@@ -366,9 +374,9 @@ void ChatLogFunc(bool isCreate, vector<Chat>& chats_v){
 				break;
 			default:
 				if( login_act.payload.logact.isUpper )
-					name.push_back(ch);
+					name += ch;
 				else
-					pass.push_back(ch);
+					pass += ch;
 
 				login_act.payload = ActionsPayload(
 					LoginAction(name, pass, login_act.payload.logact.isUpper)
@@ -379,7 +387,6 @@ void ChatLogFunc(bool isCreate, vector<Chat>& chats_v){
 }
 
 bool tryAuth(string name, string pass, bool isCreate){
-	fprintf(stderr, "%s\n", "inside tA");
 	if( isCreate ){
 		if( isempty(name) )
 			return 0;

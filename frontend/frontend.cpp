@@ -4,6 +4,10 @@
 #include "App.cpp"
 #include "ncurscript.cpp"
 
+// #include "Peer.h"
+// #include "User.h"
+// #include "Storage.h"
+
 using namespace std;
 
 
@@ -11,6 +15,8 @@ void MessengerUI::Run(){
 	initscr();
 	curs_set(0);
 	keypad(stdscr, TRUE);
+
+	// User usr(0);
 
 	// if( login() ){
 	// 	delwin(stdscr);

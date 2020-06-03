@@ -1,3 +1,6 @@
+#ifndef LANG_EN
+#define LANG_EN
+
 #define JOIN_CHAT ("Join Chat")
 
 #define CREATE_CHAT ("Create Chat")
@@ -25,3 +28,5 @@
 #define WRONG_CHAT ("Chat haven't been found")
 
 #define NO_CHAT_NAME ("Chat name is empty")
+
+#endif
