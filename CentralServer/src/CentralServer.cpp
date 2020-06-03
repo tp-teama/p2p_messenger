@@ -252,15 +252,15 @@ bool CentralServer::CreateChat(string chatname, string password, o_uuid user_id)
 
 string CentralServer::GetChatPort(string chatname, o_uuid id) {
     if (chatname == ""){
-        return "";
+        return "0";
     }
 
     if (chats.find(chatname) == chats.end()){
-        return "";
+        return "0";
     }
 
     if (users.find(id) == users.end()){
-        return "";
+        return "0";
     }
 
     Chat c = chats.find(chatname)->second;
@@ -271,14 +271,14 @@ string CentralServer::GetChatPort(string chatname, o_uuid id) {
             o_uuid id = *it;
             std::map<o_uuid, User>::iterator us = users.find(id);
             if (us == users.end()){
-                return "";
+                return "0";
             }
 
             return us->second.ip_adress;
         }
     }
 
-    return "";
+    return "0";
 }
 
 string CentralServer::ParseRequest(string req) {
