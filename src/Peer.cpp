@@ -56,6 +56,7 @@ bool Peer::SendToChat(std::shared_ptr<Message> message, std::shared_ptr<Chat> ch
     std::string response = buf->data();
     int port = stoi(response.substr(response.find(':') + 1));
     if (!port) {
+        client.Close();
         return false;
     }
     std::string requestMessage = "chat_name:" + chat->name + " sender_id:" + message->name_sender
