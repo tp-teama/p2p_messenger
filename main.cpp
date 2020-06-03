@@ -1,5 +1,8 @@
-#include <iostream>
+#include "frontend/frontend.h"
 
-int main() {
-    return 0;
+using namespace std;
+
+int main(){
+	MessengerUI mui;
+	mui.Run();
 }
