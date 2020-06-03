@@ -11,8 +11,6 @@
 
 #define BACKSPACE 7
 #define ENTER 10
-#define DOWN 9
-#define UP 9
 #define ESC 27
 #define UP 3
 #define DOWN 2
@@ -162,7 +160,7 @@ bool chat_window(){
 	bool status = 0;
 	int cur_sel = 0;
 	int prev_sel = 0;
-	int cur_chat = 0;
+	int cur_chat = -1;
 	Message msgObj;
 	string msg = "";
 	bool isLeft = 1;
@@ -243,7 +241,7 @@ void refocus(
 	else
 		cur_sel = (cur_sel + 1) % max_focus;
 
-	if( 0 <= cur_sel && cur_sel <= max_focus - 3 )
+	if( 0 <= cur_sel && cur_sel <= max_focus - 3 && cur_chat != -1 )
 		cur_chat = cur_sel;
 
 	Action act(UnfocusActionType);
